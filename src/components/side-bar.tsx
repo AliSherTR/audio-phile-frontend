@@ -11,6 +11,8 @@ import {
     Grid3X3,
     Settings,
     LogOut,
+    MoveLeft,
+    MoveRight,
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -21,36 +23,42 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenuContent } from "./ui/dropdown-menu";
 import logo from "../../assets/logo.svg";
 import Image from "next/image";
+import { Button } from "./ui/button";
 
 const sideBarLinks: sideBarLink[] = [
     {
-        href: "/",
+        href: "/dashboard",
         name: "Dashboard",
         icon: LayoutDashboard,
     },
     {
-        href: "/users",
+        href: "/dashboard/users",
         name: "Users",
         icon: Users,
     },
     {
-        href: "/products",
+        href: "/dashboard/products",
         name: "Products",
         icon: ShoppingCart,
     },
     {
-        href: "/orders",
+        href: "/dashboard/orders",
         name: "Orders",
         icon: Grid3X3,
     },
     {
-        href: "/settings",
+        href: "/dashboard/settings",
         name: "Settings",
         icon: Settings,
     },
 ];
 
-export default function SideBar() {
+interface sideBarProps {
+    sideBarOpen: boolean;
+    setSideBarOpen: (sidebar: boolean) => void;
+}
+
+export default function SideBar({ sideBarOpen, setSideBarOpen }: sideBarProps) {
     const pathname = usePathname();
 
     return (
@@ -68,7 +76,11 @@ export default function SideBar() {
                 </Link>
             </div>
             <div className="flex-1 w-full ">
-                <h1 className=" mb-5 font-semibold px-3 py-2">
+                <h1
+                    className={`mb-5 font-semibold px-3 py-2 ${
+                        sideBarOpen ? "text-base" : "text-xs"
+                    }`}
+                >
                     Main Dashboard
                 </h1>
                 <ul>
@@ -76,14 +88,16 @@ export default function SideBar() {
                         <li className="mb-5 " key={index}>
                             <Link
                                 href={link.href}
-                                className={`block w-full px-3 py-2 rounded-md flex items-center gap-2 ${
+                                className={`w-full px-3 py-2 rounded-md flex items-center ${
+                                    sideBarOpen ? "" : "justify-center"
+                                } gap-2 ${
                                     pathname === link.href
                                         ? "bg-blue-300 text-white "
                                         : ""
                                 } `}
                             >
                                 <link.icon size={18} className="inline-block" />
-                                {link.name}
+                                {sideBarOpen && link.name}
                             </Link>
                         </li>
                     ))}
@@ -112,6 +126,18 @@ export default function SideBar() {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+            </div>
+            <div className=" w-full px-3 py-2">
+                <Button
+                    variant={"secondary"}
+                    className="w-full space-x-3"
+                    onClick={() => setSideBarOpen(!sideBarOpen)}
+                >
+                    {sideBarOpen ? <MoveLeft /> : <MoveRight />}
+                    <span className=" font-semibold">
+                        {sideBarOpen ? "Close" : "Open"}
+                    </span>
+                </Button>
             </div>
         </aside>
     );
