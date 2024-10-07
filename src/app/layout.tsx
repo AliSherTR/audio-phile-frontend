@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SideBar from "@/components/side-bar";
+import Header from "@/components/header";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -13,7 +15,19 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body>{children}</body>
+            <body>
+                <div className="h-screen grid grid-rows-[auto_1fr] grid-cols-12 overflow-hidden">
+                    <div className="h-full col-start-1 col-end-3 row-span-full overflow-y-auto">
+                        <SideBar />
+                    </div>
+                    <div className="col-start-3 col-span-full">
+                        <Header />
+                    </div>
+                    <main className="col-start-3 col-span-full overflow-auto bg-yellow-500">
+                        {children}
+                    </main>
+                </div>
+            </body>
         </html>
     );
 }
