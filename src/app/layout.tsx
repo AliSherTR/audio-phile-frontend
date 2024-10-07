@@ -23,7 +23,7 @@ export default function RootLayout({
                     <div className="col-start-3 col-span-full">
                         <Header />
                     </div>
-                    <main className="col-start-3 col-span-full overflow-auto bg-yellow-500">
+                    <main className="col-start-3 col-span-full overflow-auto bg-gray-100 px-8 py-12 ">
                         {children}
                     </main>
                 </div>
