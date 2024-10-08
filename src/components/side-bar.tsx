@@ -10,17 +10,11 @@ import {
     ShoppingCart,
     Grid3X3,
     Settings,
-    LogOut,
     MoveLeft,
     MoveRight,
+    Calendar,
 } from "lucide-react";
-import {
-    DropdownMenu,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { DropdownMenuContent } from "./ui/dropdown-menu";
+
 import logo from "../../assets/logo.svg";
 import Image from "next/image";
 import { Button } from "./ui/button";
@@ -50,6 +44,11 @@ const sideBarLinks: sideBarLink[] = [
         href: "/dashboard/settings",
         name: "Settings",
         icon: Settings,
+    },
+    {
+        href: "/dashboard/events",
+        name: "Events",
+        icon: Calendar,
     },
 ];
 
@@ -104,29 +103,6 @@ export default function SideBar({ sideBarOpen, setSideBarOpen }: sideBarProps) {
                 </ul>
             </div>
 
-            <div className=" w-full px-3 py-2">
-                <DropdownMenu>
-                    <DropdownMenuTrigger className=" outline-none relative">
-                        <Avatar>
-                            <AvatarImage
-                                className=" hover:opacity-75 transition"
-                                src="https://avatars.githubusercontent.com/u/94902748?v=4"
-                            />
-                            <AvatarFallback className="bg-sky-500"></AvatarFallback>
-                        </Avatar>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        align="center"
-                        side="right"
-                        className="w-60"
-                    >
-                        <DropdownMenuItem>
-                            <LogOut className="mr-2" />
-                            Log Out
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
             <div className=" w-full px-3 py-2">
                 <Button
                     variant={"secondary"}

@@ -13,8 +13,8 @@ export default function DashboardLayout({
         <div className="h-screen grid grid-rows-[auto_1fr] grid-cols-12 overflow-hidden">
             <div
                 className={`h-full  ${
-                    sideBarOpen ? "col-end-3" : "col-end-2"
-                } col-start-1 col-end-3 row-span-full overflow-y-auto`}
+                    sideBarOpen ? "col-end-3" : "col-end-1"
+                } col-start-1  row-span-full overflow-y-auto`}
             >
                 <SideBar
                     sideBarOpen={sideBarOpen}
