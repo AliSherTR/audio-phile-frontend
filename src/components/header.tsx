@@ -19,7 +19,7 @@ import { AvatarFallback } from "@radix-ui/react-avatar";
 export default function Header() {
     const pathName = usePathname();
     return (
-        <header className=" py-8 px-4 bg-gray-200 shadow-lg flex items-center gap-4">
+        <header className=" py-3 px-4  shadow-lg flex items-center gap-4">
             <Breadcrumb pathname={pathName} />
 
             <div className=" flex-1 flex justify-end">

@@ -1,5 +1,10 @@
 import React from "react";
+import ProductsTable from "@/features/products/components/products-table";
 
 export default function ProductsPage() {
-    return <div>Products</div>;
+    return (
+        <>
+            <ProductsTable />
+        </>
+    );
 }

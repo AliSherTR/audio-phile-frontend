@@ -40,15 +40,16 @@ const sideBarLinks: sideBarLink[] = [
         name: "Orders",
         icon: Grid3X3,
     },
-    {
-        href: "/dashboard/settings",
-        name: "Settings",
-        icon: Settings,
-    },
+
     {
         href: "/dashboard/events",
         name: "Events",
         icon: Calendar,
+    },
+    {
+        href: "/dashboard/settings",
+        name: "Settings",
+        icon: Settings,
     },
 ];
 
