@@ -13,7 +13,7 @@ export const Breadcrumb = ({ pathname }: Props) => {
         const segmentLabel = segment.charAt(0).toUpperCase() + segment.slice(1); // Capitalize segment
 
         return (
-            <h1 className=" font-semibold text-lg" key={routeTo}>
+            <h1 className=" font-semibold text-xs" key={routeTo}>
                 {index > 0 && " > "}
                 <Link href={routeTo}>{segmentLabel}</Link>
             </h1>
@@ -21,7 +21,10 @@ export const Breadcrumb = ({ pathname }: Props) => {
     });
 
     return (
-        <nav className=" flex gap-3" aria-label="breadcrumb">
+        <nav
+            className=" ml-10 flex items-center gap-2 md:ml-0 md:mt-0 mt-2"
+            aria-label="breadcrumb"
+        >
             {breadcrumb}
         </nav>
     );

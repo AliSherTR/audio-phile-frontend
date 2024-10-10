@@ -62,7 +62,7 @@ export default function SideBar({ sideBarOpen, setSideBarOpen }: sideBarProps) {
     const pathname = usePathname();
 
     return (
-        <aside className="h-full flex flex-col px-4 py-6">
+        <aside className="h-full flex flex-col px-4 py-6 bg-white">
             <div className="mb-10 px-3 py-2">
                 <Link href="/">
                     <Image
