@@ -1,28 +1,21 @@
+import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useState, ReactNode } from "react";
-
-// Define the User interface
 interface User {
-    id: string | null;
-    username: string;
+    name: string;
     email: string;
     isAuthenticated: boolean;
-    preferences?: Record<string, unknown>;
+    token: string;
 }
-
-// Define the context value type
 interface UserContextType {
     user: User;
-    loginUser: (userData: Omit<User, "isAuthenticated">) => void;
+    loginUser: (email: string, password: string) => void;
     logoutUser: () => void;
+    error: string;
 }
-
-// Create UserContext with default undefined value
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Export the UserContext itself
 export { UserContext };
 
-// Custom hook to use the UserContext
 export const useUser = (): UserContextType => {
     const context = useContext(UserContext);
     if (!context) {
@@ -31,37 +24,91 @@ export const useUser = (): UserContextType => {
     return context;
 };
 
-// Define the provider props type
 interface UserProviderProps {
     children: ReactNode;
 }
 
-// UserProvider component
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-    const [user, setUser] = useState<User>({
-        id: null,
-        username: "",
-        email: "",
-        isAuthenticated: false,
-        preferences: {},
+    const router = useRouter();
+    const [user, setUser] = useState<User>(() => {
+        const storedUser = localStorage.getItem("User");
+        return storedUser
+            ? JSON.parse(storedUser)
+            : {
+                  name: "",
+                  email: "",
+                  isAuthenticated: false,
+                  token: "",
+              };
     });
+    const [error, setError] = useState("");
 
-    const loginUser = (userData: Omit<User, "isAuthenticated">) => {
-        setUser({ ...userData, isAuthenticated: true });
+    const loginUser = async (email: string, password: string) => {
+        try {
+            const res = await fetch("http://localhost:8000/signin", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
+            });
+
+            const data = await res.json();
+            const { status, data: userData } = data;
+
+            if (status !== "success") {
+                throw new Error("Invalid Email or Password");
+            }
+            if (userData.token) {
+                if (userData.role === "ADMIN") {
+                    localStorage.setItem(
+                        "User",
+                        JSON.stringify({
+                            name: userData.name,
+                            email: userData.email,
+                            isAuthenticated: true,
+                            token: userData.token,
+                        })
+                    );
+                    document.cookie = `auth-token=${userData.token}; path=/; max-age=604800; SameSite=Strict`;
+                    setUser(() => {
+                        return {
+                            name: userData.name,
+                            email: userData.email,
+                            isAuthenticated: true,
+                            token: userData.token,
+                        };
+                    });
+                } else {
+                    throw new Error("Only Admins can access this application");
+                }
+            }
+
+            router.push("/dashboard");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
+        }
     };
 
     const logoutUser = () => {
+        localStorage.removeItem("User");
+        document.cookie = "auth-token=; path=/; max-age=0; SameSite=Strict";
         setUser({
-            id: null,
-            username: "",
+            name: "",
             email: "",
             isAuthenticated: false,
-            preferences: {},
+            token: "",
         });
+        router.push("/");
     };
 
     return (
-        <UserContext.Provider value={{ user, loginUser, logoutUser }}>
+        <UserContext.Provider value={{ user, loginUser, logoutUser, error }}>
             {children}
         </UserContext.Provider>
     );

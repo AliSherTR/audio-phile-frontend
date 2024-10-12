@@ -15,9 +15,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
+import { useUser } from "@/context/UserProvider";
 
 export default function Header() {
     const pathName = usePathname();
+    const { logoutUser } = useUser();
     return (
         <header className=" py-3 px-4  shadow-lg flex items-center gap-4">
             <Breadcrumb pathname={pathName} />
@@ -49,7 +51,7 @@ export default function Header() {
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={logoutUser}>
                             <LogOut className="mr-2 h-4 w-4" />
                             <span>Log out</span>
                         </DropdownMenuItem>

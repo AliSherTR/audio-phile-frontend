@@ -12,9 +12,19 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useUser } from "@/context/UserProvider";
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const { loginUser, error } = useUser();
+
+    const handleLogIn = (email: string, password: string) => {
+        loginUser(email, password);
+    };
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -37,6 +47,8 @@ export default function LoginForm() {
                         <Input
                             id="email"
                             type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="m@example.com"
                             required
                         />
@@ -47,6 +59,8 @@ export default function LoginForm() {
                             <Input
                                 id="password"
                                 type={showPassword ? "text" : "password"}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Enter your password"
                                 required
                             />
@@ -64,8 +78,14 @@ export default function LoginForm() {
                         </div>
                     </div>
                 </CardContent>
+                {error.length ? error : ""}
                 <CardFooter className="flex flex-col space-y-4">
-                    <Button className="w-full">Sign In</Button>
+                    <Button
+                        className="w-full"
+                        onClick={() => handleLogIn(email, password)}
+                    >
+                        Sign In
+                    </Button>
                     <div className="text-sm text-center text-gray-500">
                         <a
                             href="#"
