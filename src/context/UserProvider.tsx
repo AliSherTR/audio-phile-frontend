@@ -31,7 +31,7 @@ interface UserProviderProps {
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const router = useRouter();
     const [user, setUser] = useState<User>(() => {
-        const storedUser = localStorage.getItem("User");
+        const storedUser = window.localStorage.getItem("User");
         return storedUser
             ? JSON.parse(storedUser)
             : {
@@ -64,7 +64,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             }
             if (userData.token) {
                 if (userData.role === "ADMIN") {
-                    localStorage.setItem(
+                    window.localStorage.setItem(
                         "User",
                         JSON.stringify({
                             name: userData.name,
@@ -96,7 +96,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     };
 
     const logoutUser = () => {
-        localStorage.removeItem("User");
+        window.localStorage.removeItem("User");
         document.cookie = "auth-token=; path=/; max-age=0; SameSite=Strict";
         setUser({
             name: "",

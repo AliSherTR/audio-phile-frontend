@@ -1,29 +1,48 @@
 "use client";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useUser } from "@/context/UserProvider";
+import ErrorMessage from "@/components/error-message";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { LoginSchema } from "@/schemas";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
-
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-
+    const [IsPending, startTransition] = useTransition();
     const { loginUser, error } = useUser();
 
-    const handleLogIn = (email: string, password: string) => {
-        loginUser(email, password);
+    const form = useForm<z.infer<typeof LoginSchema>>({
+        resolver: zodResolver(LoginSchema),
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+    });
+
+    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+        const { email, password } = values;
+        startTransition(() => {
+            loginUser(email, password);
+        });
     };
 
     const togglePasswordVisibility = () => {
@@ -41,60 +60,77 @@ export default function LoginForm() {
                         Enter your email and password to sign in
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="m@example.com"
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
-                        <div className="relative">
-                            <Input
-                                id="password"
-                                type={showPassword ? "text" : "password"}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter your password"
-                                required
-                            />
-                            <button
-                                type="button"
-                                onClick={togglePasswordVisibility}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                            >
-                                {showPassword ? (
-                                    <EyeOffIcon className="h-5 w-5" />
-                                ) : (
-                                    <EyeIcon className="h-5 w-5" />
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                </CardContent>
-                {error.length ? error : ""}
-                <CardFooter className="flex flex-col space-y-4">
-                    <Button
-                        className="w-full"
-                        onClick={() => handleLogIn(email, password)}
-                    >
-                        Sign In
-                    </Button>
-                    <div className="text-sm text-center text-gray-500">
-                        <a
-                            href="#"
-                            className="hover:text-primary underline underline-offset-4"
+                <CardContent className="space-y-2">
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(onSubmit)}
+                            className="space-y-2"
                         >
-                            Forgot your password?
-                        </a>
-                    </div>
-                </CardFooter>
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="johndoe@gmail.com"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Input
+                                                    {...field}
+                                                    type={
+                                                        showPassword
+                                                            ? "text"
+                                                            : "password"
+                                                    }
+                                                    placeholder="Enter your password"
+                                                    disabled={IsPending}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={
+                                                        togglePasswordVisibility
+                                                    }
+                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                                >
+                                                    {showPassword ? (
+                                                        <EyeOffIcon className="h-5 w-5" />
+                                                    ) : (
+                                                        <EyeIcon className="h-5 w-5" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {error.length ? (
+                                <ErrorMessage message={error} />
+                            ) : (
+                                ""
+                            )}
+                            <Button type="submit" disabled={IsPending}>
+                                Login
+                            </Button>
+                        </form>
+                    </Form>
+                </CardContent>
             </Card>
         </div>
     );

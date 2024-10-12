@@ -9,8 +9,6 @@ export function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/", nextUrl));
     }
 
-    // if(!token && req.nextUrl.pathname.startsWith("/dashboard"))
-
     if (token && req.nextUrl.pathname === "/") {
         return NextResponse.redirect(new URL("/dashboard", nextUrl));
     }
