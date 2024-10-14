@@ -19,7 +19,23 @@ import { useUser } from "@/context/UserProvider";
 
 export default function Header() {
     const pathName = usePathname();
-    const { logoutUser } = useUser();
+    const { logoutUser, user } = useUser();
+
+    const profileImage = user.image;
+
+    function getAvatarInitials(name: string) {
+        if (!name) return "";
+
+        const nameParts = name.trim().split(" ");
+        if (nameParts.length === 1) {
+            return nameParts[0][0].toUpperCase();
+        }
+
+        const firstNameInitial = nameParts[0][0].toUpperCase();
+        const secondNameInitial = nameParts[1][0].toUpperCase();
+
+        return `${firstNameInitial}${secondNameInitial}`;
+    }
     return (
         <header className=" py-3 px-4  shadow-lg flex items-center gap-4">
             <Breadcrumb pathname={pathName} />
@@ -30,9 +46,11 @@ export default function Header() {
                         <Avatar>
                             <AvatarImage
                                 className=" hover:opacity-75 transition"
-                                src="https://avatars.githubusercontent.com/u/94902748?v=4"
+                                src={profileImage}
                             />
-                            <AvatarFallback className="bg-sky-500"></AvatarFallback>
+                            <AvatarFallback className="bg-sky-500 flex items-center text-xs w-full h-full justify-center text-white">
+                                {getAvatarInitials(user.name)}
+                            </AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 mr-6">

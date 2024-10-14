@@ -5,6 +5,7 @@ interface User {
     email: string;
     isAuthenticated: boolean;
     token: string;
+    image: string;
 }
 interface UserContextType {
     user: User;
@@ -39,6 +40,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                   email: "",
                   isAuthenticated: false,
                   token: "",
+                  image: "",
               };
     });
     const [error, setError] = useState("");
@@ -56,6 +58,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                 }),
             });
 
+            if (!res.ok) {
+                throw new Error("Something went wrong. Please try again later");
+            }
+
             const data = await res.json();
             const { status, data: userData } = data;
 
@@ -71,6 +77,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                             email: userData.email,
                             isAuthenticated: true,
                             token: userData.token,
+                            image: userData.image,
                         })
                     );
                     document.cookie = `auth-token=${userData.token}; path=/; max-age=604800; SameSite=Strict`;
@@ -80,6 +87,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
                             email: userData.email,
                             isAuthenticated: true,
                             token: userData.token,
+                            image: userData.image,
                         };
                     });
                 } else {
@@ -103,6 +111,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             email: "",
             isAuthenticated: false,
             token: "",
+            image: "",
         });
         router.push("/");
     };

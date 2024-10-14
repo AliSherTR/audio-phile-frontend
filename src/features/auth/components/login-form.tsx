@@ -28,6 +28,7 @@ import {
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [IsPending, startTransition] = useTransition();
+
     const { loginUser, error } = useUser();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -75,6 +76,7 @@ export default function LoginForm() {
                                         <FormControl>
                                             <Input
                                                 placeholder="johndoe@gmail.com"
+                                                disabled={IsPending}
                                                 {...field}
                                             />
                                         </FormControl>
