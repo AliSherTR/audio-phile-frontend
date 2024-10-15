@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
     Table,
     TableBody,
@@ -19,38 +19,12 @@ import {
     Trash2,
     Search,
 } from "lucide-react";
-
-// Mock data (assuming you have this defined elsewhere)
-const items = Array.from({ length: 50 }, (_, i) => ({
-    id: i + 1,
-    name: `Product ${i + 1}`,
-    price: (Math.random() * 100).toFixed(2),
-    stock: Math.floor(Math.random() * 100),
-    category: "HeadPhones",
-}));
+import useProducts from "../api/useProducts";
 
 export default function ProductsTable() {
-    const [currentPage, setCurrentPage] = useState(1);
+    const { products, totalPages, page, setPage } = useProducts();
+    console.log(products);
     const [searchTerm, setSearchTerm] = useState("");
-    const [filteredItems, setFilteredItems] = useState(items);
-    const itemsPerPage = 10;
-
-    useEffect(() => {
-        const results = items.filter((item) =>
-            item.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredItems(results);
-        setCurrentPage(1);
-    }, [searchTerm]);
-
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentItems = filteredItems.slice(startIndex, endIndex);
-
-    const nextPage = () =>
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-    const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
     const handleView = (id: number) => {
         console.log(`View item ${id}`);
@@ -63,6 +37,13 @@ export default function ProductsTable() {
     const handleDelete = (id: number) => {
         console.log(`Delete item ${id}`);
     };
+
+    if (!products?.length)
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                No Products Found
+            </div>
+        );
 
     return (
         <div className="w-full space-y-6">
@@ -94,61 +75,66 @@ export default function ProductsTable() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {currentItems.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell>{item.id}</TableCell>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell>${item.price}</TableCell>
-                                <TableCell>{item.stock}</TableCell>
-                                <TableCell>{item.category}</TableCell>
-                                <TableCell>
-                                    <div className="flex space-x-4">
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            onClick={() => handleView(item.id)}
-                                        >
-                                            <Eye className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            onClick={() => handleEdit(item.id)}
-                                        >
-                                            <Pencil className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            onClick={() =>
-                                                handleDelete(item.id)
-                                            }
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                        {products &&
+                            products.map((item) => (
+                                <TableRow key={item.id}>
+                                    <TableCell>{item.id}</TableCell>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>${item.price}</TableCell>
+                                    <TableCell>{item.stock}</TableCell>
+                                    <TableCell>{item.category}</TableCell>
+                                    <TableCell>
+                                        <div className="flex space-x-4">
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() =>
+                                                    handleView(item.id)
+                                                }
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() =>
+                                                    handleEdit(item.id)
+                                                }
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                onClick={() =>
+                                                    handleDelete(item.id)
+                                                }
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                     </TableBody>
                 </Table>
             </div>
             <div className="flex items-center justify-between mt-4">
                 <div>
-                    Page {currentPage} of {totalPages}
+                    Page {page} of {totalPages}
                 </div>
                 <div className="flex items-center space-x-4">
                     <Button
                         variant="outline"
-                        onClick={prevPage}
-                        disabled={currentPage === 1}
+                        onClick={() => setPage(() => page - 1)}
+                        disabled={page === 1}
                     >
                         <ChevronLeft className="h-4 w-4 mr-2" /> Previous
                     </Button>
                     <Button
                         variant="outline"
-                        onClick={nextPage}
-                        disabled={currentPage === totalPages}
+                        onClick={() => setPage(() => page + 1)}
+                        disabled={page === totalPages}
                     >
                         Next <ChevronRight className="h-4 w-4 ml-2" />
                     </Button>

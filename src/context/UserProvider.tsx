@@ -1,5 +1,12 @@
 import { useRouter } from "next/navigation";
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+    ReactNode,
+} from "react";
+
 interface User {
     name: string;
     email: string;
@@ -7,12 +14,14 @@ interface User {
     token: string;
     image: string;
 }
+
 interface UserContextType {
     user: User;
     loginUser: (email: string, password: string) => void;
     logoutUser: () => void;
     error: string;
 }
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export { UserContext };
@@ -31,19 +40,36 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const router = useRouter();
-    const [user, setUser] = useState<User>(() => {
-        const storedUser = window.localStorage.getItem("User");
-        return storedUser
-            ? JSON.parse(storedUser)
-            : {
-                  name: "",
-                  email: "",
-                  isAuthenticated: false,
-                  token: "",
-                  image: "",
-              };
+    const [user, setUser] = useState<User>({
+        name: "",
+        email: "",
+        isAuthenticated: false,
+        token: "",
+        image: "",
     });
     const [error, setError] = useState("");
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        const storedUser = getUserFromLocalStorage("User");
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
+
+    const getUserFromLocalStorage = (key: string) => {
+        if (typeof window !== "undefined") {
+            return window.localStorage.getItem(key);
+        }
+        return null;
+    };
+
+    const setUserToLocalStorage = (key: string, value: User) => {
+        if (typeof window !== "undefined") {
+            window.localStorage.setItem(key, JSON.stringify(value));
+        }
+    };
 
     const loginUser = async (email: string, password: string) => {
         try {
@@ -70,26 +96,17 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             }
             if (userData.token) {
                 if (userData.role === "ADMIN") {
-                    window.localStorage.setItem(
-                        "User",
-                        JSON.stringify({
-                            name: userData.name,
-                            email: userData.email,
-                            isAuthenticated: true,
-                            token: userData.token,
-                            image: userData.image,
-                        })
-                    );
+                    const newUser = {
+                        name: userData.name,
+                        email: userData.email,
+                        isAuthenticated: true,
+                        token: userData.token,
+                        image: userData.image,
+                    };
+
+                    setUserToLocalStorage("User", newUser);
                     document.cookie = `auth-token=${userData.token}; path=/; max-age=604800; SameSite=Strict`;
-                    setUser(() => {
-                        return {
-                            name: userData.name,
-                            email: userData.email,
-                            isAuthenticated: true,
-                            token: userData.token,
-                            image: userData.image,
-                        };
-                    });
+                    setUser(newUser);
                 } else {
                     throw new Error("Only Admins can access this application");
                 }
@@ -104,7 +121,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     };
 
     const logoutUser = () => {
-        window.localStorage.removeItem("User");
+        if (typeof window !== "undefined") {
+            window.localStorage.removeItem("User");
+        }
         document.cookie = "auth-token=; path=/; max-age=0; SameSite=Strict";
         setUser({
             name: "",
@@ -115,6 +134,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         });
         router.push("/");
     };
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <UserContext.Provider value={{ user, loginUser, logoutUser, error }}>
