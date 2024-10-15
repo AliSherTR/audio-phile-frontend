@@ -18,13 +18,21 @@ import {
     Pencil,
     Trash2,
     Search,
+    LoaderCircle,
 } from "lucide-react";
 import useProducts from "../api/useProducts";
 
 export default function ProductsTable() {
-    const { products, totalPages, page, setPage } = useProducts();
-    console.log(products);
-    const [searchTerm, setSearchTerm] = useState("");
+    const {
+        products,
+        totalPages,
+        currentPage,
+        setPage,
+        setSearchTerm,
+        isLoading,
+        isError,
+    } = useProducts();
+    const [inputValue, setInputValue] = useState("");
 
     const handleView = (id: number) => {
         console.log(`View item ${id}`);
@@ -38,45 +46,59 @@ export default function ProductsTable() {
         console.log(`Delete item ${id}`);
     };
 
-    if (!products?.length)
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                No Products Found
-            </div>
-        );
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setInputValue(value);
+        setSearchTerm(value);
+    };
 
-    return (
-        <div className="w-full space-y-6">
-            <div className="flex w-full items-center mb-10">
-                <div className="relative w-64">
-                    <Search
-                        size={22}
-                        className="absolute left-2  top-[0.5rem]   text-gray-500"
-                    />
-                    <Input
-                        type="text"
-                        placeholder="Search by name..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="px-8 py-2 w-full block"
-                    />
+    const renderContent = () => {
+        if (isError) {
+            return (
+                <div className="flex-grow flex items-center justify-center">
+                    <p className="text-red-500">
+                        Something went wrong. Please try again later.
+                    </p>
                 </div>
-            </div>
-            <div className="">
-                <Table className=" w-full">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[10%]">ID</TableHead>
-                            <TableHead className="w-[25%]">Name</TableHead>
-                            <TableHead className="w-[15%]">Price</TableHead>
-                            <TableHead className="w-[15%]">Stock</TableHead>
-                            <TableHead className="w-[20%]">Category</TableHead>
-                            <TableHead className="w-[15%]">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {products &&
-                            products.map((item) => (
+            );
+        }
+
+        if (isLoading) {
+            return (
+                <div className="flex-grow flex items-center justify-center">
+                    <LoaderCircle className="animate-spin" />
+                </div>
+            );
+        }
+
+        if (!products.length) {
+            return (
+                <div className="flex-grow flex items-center justify-center">
+                    No Products Found
+                </div>
+            );
+        }
+
+        return (
+            <>
+                <div className="overflow-x-auto">
+                    <Table className="w-full">
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[10%]">ID</TableHead>
+                                <TableHead className="w-[25%]">Name</TableHead>
+                                <TableHead className="w-[15%]">Price</TableHead>
+                                <TableHead className="w-[15%]">Stock</TableHead>
+                                <TableHead className="w-[20%]">
+                                    Category
+                                </TableHead>
+                                <TableHead className="w-[15%]">
+                                    Actions
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {products.map((item) => (
                                 <TableRow key={item.id}>
                                     <TableCell>{item.id}</TableCell>
                                     <TableCell>{item.name}</TableCell>
@@ -116,30 +138,52 @@ export default function ProductsTable() {
                                     </TableCell>
                                 </TableRow>
                             ))}
-                    </TableBody>
-                </Table>
-            </div>
-            <div className="flex items-center justify-between mt-4">
-                <div>
-                    Page {page} of {totalPages}
+                        </TableBody>
+                    </Table>
                 </div>
-                <div className="flex items-center space-x-4">
-                    <Button
-                        variant="outline"
-                        onClick={() => setPage(() => page - 1)}
-                        disabled={page === 1}
-                    >
-                        <ChevronLeft className="h-4 w-4 mr-2" /> Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={() => setPage(() => page + 1)}
-                        disabled={page === totalPages}
-                    >
-                        Next <ChevronRight className="h-4 w-4 ml-2" />
-                    </Button>
+                <div className="flex items-center justify-between mt-4">
+                    <div>
+                        Page {currentPage} of {totalPages}
+                    </div>
+                    <div className="flex items-center space-x-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => setPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft className="h-4 w-4 mr-2" /> Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => setPage(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next <ChevronRight className="h-4 w-4 ml-2" />
+                        </Button>
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    return (
+        <div className="w-full space-y-6 flex flex-col min-h-screen">
+            <div className="flex w-full items-center mb-10">
+                <div className="relative w-64">
+                    <Search
+                        size={22}
+                        className="absolute left-2 top-[0.5rem] text-gray-500"
+                    />
+                    <Input
+                        type="text"
+                        placeholder="Search by name..."
+                        value={inputValue}
+                        onChange={handleSearchChange}
+                        className="px-8 py-2 w-full block"
+                    />
                 </div>
             </div>
+            {renderContent()}
         </div>
     );
 }
