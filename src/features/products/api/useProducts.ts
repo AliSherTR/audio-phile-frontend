@@ -36,6 +36,7 @@ export default function useProducts() {
     }: QueryFunctionContext<
         [string, number, number, string]
     >): Promise<ProductsResponse> => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [_, page, itemsPerPage, search] = queryKey;
         const url = new URL(API_URL);
         url.searchParams.append("page", page.toString());

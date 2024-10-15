@@ -168,7 +168,7 @@ export default function ProductsTable() {
 
     return (
         <div className="w-full space-y-6 flex flex-col min-h-screen">
-            <div className="flex w-full items-center mb-10">
+            <div className="flex w-full items-center justify-between mb-10">
                 <div className="relative w-64">
                     <Search
                         size={22}
