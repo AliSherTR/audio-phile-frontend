@@ -60,6 +60,7 @@ export default function useProducts() {
         queryFn: fetchProducts,
     });
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const debouncedSetSearchTerm = useCallback(
         debounce((value: string) => setSearchTerm(value), 300),
         []
