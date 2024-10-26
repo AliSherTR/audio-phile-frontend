@@ -10,17 +10,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,7 +24,7 @@ import {
 } from "lucide-react";
 import useProducts from "../api/useProducts";
 import useSingleProduct from "../api/useSingleProduct";
-import { useToast } from "@/hooks/use-toast";
+import DeleteProductModal from "./product-delete-modal";
 
 export default function ProductsTable() {
     const {
@@ -47,8 +37,8 @@ export default function ProductsTable() {
         isError,
     } = useProducts();
 
-    const { deleteProduct, isDeleting, isDeleted } = useSingleProduct("");
-    const { toast } = useToast();
+    const { isDeleting } = useSingleProduct("");
+
     const [inputValue, setInputValue] = useState("");
 
     const handleView = (id: number) => {
@@ -57,10 +47,6 @@ export default function ProductsTable() {
 
     const handleEdit = (id: number) => {
         console.log(`Edit item ${id}`);
-    };
-
-    const handleDelete = (id: string) => {
-        deleteProduct(id);
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,45 +146,9 @@ export default function ProductsTable() {
                                                         <Trash2 className="h4 w-4" />
                                                     </Button>
                                                 </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>
-                                                            Are you absolutely
-                                                            sure?
-                                                        </AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This action cannot
-                                                            be undone. This will
-                                                            permanently delete
-                                                            the product data
-                                                            from the server.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>
-                                                            Cancel
-                                                        </AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={() => {
-                                                                if (isDeleted) {
-                                                                    toast({
-                                                                        title: "Product deleted",
-                                                                        description:
-                                                                            "Successfully deleted the product",
-                                                                    });
-                                                                }
-                                                                handleDelete(
-                                                                    JSON.stringify(
-                                                                        item.id
-                                                                    )
-                                                                );
-                                                            }}
-                                                            className=" bg-red-500"
-                                                        >
-                                                            Continue
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
+                                                <DeleteProductModal
+                                                    id={JSON.stringify(item.id)}
+                                                />
                                             </AlertDialog>
                                         </div>
                                     </TableCell>
