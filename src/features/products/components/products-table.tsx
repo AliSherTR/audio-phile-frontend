@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
     Table,
     TableBody,
@@ -9,6 +10,17 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,7 +33,8 @@ import {
     LoaderCircle,
 } from "lucide-react";
 import useProducts from "../api/useProducts";
-import Link from "next/link";
+import useSingleProduct from "../api/useSingleProduct";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProductsTable() {
     const {
@@ -33,6 +46,9 @@ export default function ProductsTable() {
         isLoading,
         isError,
     } = useProducts();
+
+    const { deleteProduct, isDeleting, isDeleted } = useSingleProduct("");
+    const { toast } = useToast();
     const [inputValue, setInputValue] = useState("");
 
     const handleView = (id: number) => {
@@ -43,8 +59,8 @@ export default function ProductsTable() {
         console.log(`Edit item ${id}`);
     };
 
-    const handleDelete = (id: number) => {
-        console.log(`Delete item ${id}`);
+    const handleDelete = (id: string) => {
+        deleteProduct(id);
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +88,13 @@ export default function ProductsTable() {
             );
         }
 
+        if (isDeleting) {
+            return (
+                <div className="flex-grow flex items-center justify-center">
+                    <LoaderCircle className="animate-spin" />
+                </div>
+            );
+        }
         if (!products.length) {
             return (
                 <div className="flex-grow flex items-center justify-center">
@@ -131,15 +154,52 @@ export default function ProductsTable() {
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={() =>
-                                                    handleDelete(item.id)
-                                                }
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="outline">
+                                                        <Trash2 className="h4 w-4" />
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>
+                                                            Are you absolutely
+                                                            sure?
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This action cannot
+                                                            be undone. This will
+                                                            permanently delete
+                                                            the product data
+                                                            from the server.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>
+                                                            Cancel
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            onClick={() => {
+                                                                if (isDeleted) {
+                                                                    toast({
+                                                                        title: "Product deleted",
+                                                                        description:
+                                                                            "Successfully deleted the product",
+                                                                    });
+                                                                }
+                                                                handleDelete(
+                                                                    JSON.stringify(
+                                                                        item.id
+                                                                    )
+                                                                );
+                                                            }}
+                                                            className=" bg-red-500"
+                                                        >
+                                                            Continue
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
                                         </div>
                                     </TableCell>
                                 </TableRow>
