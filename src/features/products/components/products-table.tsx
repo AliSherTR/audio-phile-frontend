@@ -21,6 +21,7 @@ import {
     LoaderCircle,
 } from "lucide-react";
 import useProducts from "../api/useProducts";
+import Link from "next/link";
 
 export default function ProductsTable() {
     const {
@@ -107,15 +108,20 @@ export default function ProductsTable() {
                                     <TableCell>{item.category}</TableCell>
                                     <TableCell>
                                         <div className="flex space-x-4">
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={() =>
-                                                    handleView(item.id)
-                                                }
+                                            <Link
+                                                href={`/dashboard/products/${item.id}`}
                                             >
-                                                <Eye className="h-4 w-4" />
-                                            </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() =>
+                                                        handleView(item.id)
+                                                    }
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Button>
+                                            </Link>
+
                                             <Button
                                                 variant="outline"
                                                 size="icon"
