@@ -3,17 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
     ChevronLeft,
     ChevronRight,
     Eye,
@@ -25,6 +14,20 @@ import {
 import useProducts from "../api/useProducts";
 import useSingleProduct from "../api/useSingleProduct";
 import DeleteProductModal from "./product-delete-modal";
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import ProductForm from "./product-form";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ProductsTable() {
     const {
@@ -92,6 +95,7 @@ export default function ProductsTable() {
         return (
             <>
                 <div className="overflow-x-auto">
+                    <div></div>
                     <Table className="w-full">
                         <TableHeader>
                             <TableRow>
@@ -197,6 +201,18 @@ export default function ProductsTable() {
                         onChange={handleSearchChange}
                         className="px-8 py-2 w-full block"
                     />
+                </div>
+                <div>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">Add Product</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px] md:max-w-[700px] lg:max-w-[1200px]">
+                            <ScrollArea className="h-[80vh] pr-4">
+                                <ProductForm />
+                            </ScrollArea>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
             {renderContent()}
