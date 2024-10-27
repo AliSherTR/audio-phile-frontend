@@ -26,34 +26,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { X, Upload } from "lucide-react";
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-const formSchema = z.object({
-    name: z.string().min(2, "Product name must be at least 2 characters"),
-    price: z.string().refine((val) => !isNaN(Number(val)), {
-        message: "Price must be a valid number",
-    }),
-    description: z
-        .string()
-        .min(10, "Description must be at least 10 characters"),
-    category: z.string().min(1, "Please select a category"),
-    isPromoted: z.boolean(),
-    isFeatured: z.boolean(),
-    boxItems: z.array(z.string()).min(1, "At least one box item is required"),
-    image: z
-        .any()
-        .refine((files) => files?.length == 1, "Image is required.")
-        .refine(
-            (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-            `Max file size is 5MB.`
-        )
-        .refine(
-            (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-            ".jpg, .jpeg, .png and .webp files are accepted."
-        ),
-});
+import { formSchema } from "@/schemas";
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -262,7 +235,6 @@ export default function ProductForm() {
                                 <Button
                                     type="button"
                                     variant="destructive"
-                                    size="icon"
                                     onClick={() => remove(index)}
                                 >
                                     <X className="h-4 w-4" />
