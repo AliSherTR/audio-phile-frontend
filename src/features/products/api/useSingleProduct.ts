@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserProvider";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface Product {
@@ -46,6 +47,21 @@ export default function useSingleProduct(id: string | string[]) {
         }
     };
 
+    const createProduct = async (data: FormData) => {
+        const res = await fetch(`${API_URL}`, {
+            method: "POST",
+            body: data,
+            headers: {
+                Authorization: `Bearer ${token}`,
+                // Don't set Content-Type header, let the browser set it automatically for FormData
+            },
+        });
+        if (!res.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return res.json();
+    };
+
     const { data, isLoading, isError } = useQuery({
         queryKey: ["product", id],
         queryFn: fetchProduct,
@@ -62,6 +78,17 @@ export default function useSingleProduct(id: string | string[]) {
         },
     });
 
+    const {
+        mutate: createProductMutation,
+        isPending: isCreating,
+        isSuccess: isCreated,
+    } = useMutation({
+        mutationFn: createProduct,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+        },
+    });
+
     return {
         data: data?.data,
         isLoading,
@@ -69,5 +96,8 @@ export default function useSingleProduct(id: string | string[]) {
         isDeleting,
         isDeleted,
         deleteProduct: deleteProductMutation,
+        isCreating,
+        isCreated,
+        createProductMutation,
     };
 }

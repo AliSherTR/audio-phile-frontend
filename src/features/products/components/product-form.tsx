@@ -26,23 +26,30 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { X, Upload } from "lucide-react";
-import { formSchema } from "@/schemas";
+import { productSchema } from "@/schemas";
+import useSingleProduct from "../api/useSingleProduct";
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof productSchema>;
 
 export default function ProductForm() {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [submitStatus, setSubmitStatus] = useState<string | null>(null);
+
+    const { createProductMutation } = useSingleProduct("");
 
     const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(productSchema),
         defaultValues: {
             name: "",
             price: "",
             description: "",
-            category: "",
+            features: "",
+            category: undefined,
             isPromoted: false,
             isFeatured: false,
-            boxItems: [""],
+            accessories: [""],
+            image: null,
+            stock: "",
         },
     });
 
@@ -51,9 +58,30 @@ export default function ProductForm() {
         name: "boxItems",
     });
 
-    function onSubmit(values: FormValues) {
-        console.log(values);
-        // Here you would typically send the form data to your backend
+    async function onSubmit(values: FormValues) {
+        setSubmitStatus("Submitting...");
+        const formData = new FormData();
+
+        Object.entries(values).forEach(([key, value]) => {
+            if (key === "accessories") {
+                formData.append(key, JSON.stringify(value));
+            } else if (key === "image" && value instanceof FileList) {
+                formData.append(key, value[0]);
+            } else {
+                formData.append(key, value?.toString() ?? "");
+            }
+        });
+
+        try {
+            createProductMutation(formData);
+            console.log("form data:", formData);
+            setSubmitStatus("Product created successfully");
+            form.reset();
+            setImagePreview(null);
+        } catch (error) {
+            console.error("Error creating product:", error);
+            setSubmitStatus("Error creating product. Please try again.");
+        }
     }
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +104,7 @@ export default function ProductForm() {
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-8"
+                    encType="multipart/form-data"
                 >
                     <FormField
                         control={form.control}
@@ -102,7 +131,26 @@ export default function ProductForm() {
                                 <FormLabel>Product Price</FormLabel>
                                 <FormControl>
                                     <Input
+                                        type="number"
                                         placeholder="Enter price"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="stock"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Product Price</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="number"
+                                        placeholder="Enter stock"
                                         {...field}
                                     />
                                 </FormControl>
@@ -131,6 +179,24 @@ export default function ProductForm() {
 
                     <FormField
                         control={form.control}
+                        name="features"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Product Features</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Enter product features"
+                                        className="resize-none"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
                         name="category"
                         render={({ field }) => (
                             <FormItem>
@@ -148,8 +214,11 @@ export default function ProductForm() {
                                         <SelectItem value="Headphones">
                                             Headphones
                                         </SelectItem>
-                                        <SelectItem value="clothing">
+                                        <SelectItem value="Earphones">
                                             Earphones
+                                        </SelectItem>
+                                        <SelectItem value="Speakers">
+                                            Speakers
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -215,12 +284,10 @@ export default function ProductForm() {
                             >
                                 <FormField
                                     control={form.control}
-                                    name={`boxItems.${index}`}
+                                    name={`accessories.${index}`}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>{`Item ${
-                                                index + 1
-                                            } Name`}</FormLabel>
+                                            <FormLabel>Item Name</FormLabel>
                                             <FormControl>
                                                 <Input
                                                     placeholder="Enter item name"
@@ -244,7 +311,7 @@ export default function ProductForm() {
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => append([""])}
+                            onClick={() => append("")}
                         >
                             Add Box Item
                         </Button>
@@ -253,7 +320,8 @@ export default function ProductForm() {
                     <FormField
                         control={form.control}
                         name="image"
-                        render={({ field }) => (
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        render={({ field: { value, onChange, ...field } }) => (
                             <FormItem>
                                 <FormLabel>Product Image</FormLabel>
                                 <FormControl>
@@ -289,11 +357,10 @@ export default function ProductForm() {
                                                 type="file"
                                                 className="hidden"
                                                 onChange={(e) => {
-                                                    field.onChange(
-                                                        e.target.files
-                                                    );
+                                                    onChange(e.target.files);
                                                     handleImageChange(e);
                                                 }}
+                                                {...field}
                                             />
                                         </Label>
                                     </div>
@@ -306,6 +373,12 @@ export default function ProductForm() {
                     <Button type="submit" className="w-full">
                         Submit
                     </Button>
+
+                    {submitStatus && (
+                        <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded">
+                            {submitStatus}
+                        </div>
+                    )}
                 </form>
             </Form>
         </div>

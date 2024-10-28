@@ -12,6 +12,7 @@ export default function SingleProductPage() {
     const { id } = useParams();
 
     const { data, isLoading, isError } = useSingleProduct(id);
+    console.log(data);
 
     if (isLoading) {
         return (
@@ -39,11 +40,11 @@ export default function SingleProductPage() {
             </Button>
             <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-4">
-                    <Image
-                        width={500}
-                        height={500}
-                        src="https://techarc.pk/wp-content/uploads/2023/10/Boost-Sonic-Bluetooth-Headphone.jpg"
-                        // src={data?.image || ""}
+                    <img
+                        // src="https://techarc.pk/wp-content/uploads/2023/10/Boost-Sonic-Bluetooth-Headphone.jpg"
+                        src={
+                            "D:/portfolio-projects/audio-phile/server/uploads/image-1730101390467-142550309.jpg"
+                        }
                         alt={data?.name || ""}
                         className="w-full h-auto object-cover rounded-lg shadow-lg p-4"
                     />
