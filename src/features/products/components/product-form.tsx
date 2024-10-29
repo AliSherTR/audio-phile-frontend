@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { X, Upload } from "lucide-react";
+import { X, Upload, LoaderIcon } from "lucide-react";
 import { productSchema } from "@/schemas";
 import useSingleProduct from "../api/useSingleProduct";
 
@@ -33,9 +33,8 @@ type FormValues = z.infer<typeof productSchema>;
 
 export default function ProductForm() {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [submitStatus, setSubmitStatus] = useState<string | null>(null);
 
-    const { createProductMutation } = useSingleProduct("");
+    const { createProductMutation, isCreating } = useSingleProduct("");
 
     const form = useForm<FormValues>({
         resolver: zodResolver(productSchema),
@@ -59,7 +58,6 @@ export default function ProductForm() {
     });
 
     async function onSubmit(values: FormValues) {
-        setSubmitStatus("Submitting...");
         const formData = new FormData();
 
         Object.entries(values).forEach(([key, value]) => {
@@ -71,17 +69,10 @@ export default function ProductForm() {
                 formData.append(key, value?.toString() ?? "");
             }
         });
+        createProductMutation(formData);
 
-        try {
-            createProductMutation(formData);
-            console.log("form data:", formData);
-            setSubmitStatus("Product created successfully");
-            form.reset();
-            setImagePreview(null);
-        } catch (error) {
-            console.error("Error creating product:", error);
-            setSubmitStatus("Error creating product. Please try again.");
-        }
+        form.reset();
+        setImagePreview(null);
     }
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +87,14 @@ export default function ProductForm() {
             setImagePreview(null);
         }
     };
+
+    if (isCreating) {
+        return (
+            <div className=" h-screen flex items-center justify-center">
+                <LoaderIcon className="animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="p-6">
@@ -370,15 +369,13 @@ export default function ProductForm() {
                         )}
                     />
 
-                    <Button type="submit" className="w-full">
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={isCreating}
+                    >
                         Submit
                     </Button>
-
-                    {submitStatus && (
-                        <div className="mt-4 p-4 bg-blue-100 text-blue-700 rounded">
-                            {submitStatus}
-                        </div>
-                    )}
                 </form>
             </Form>
         </div>

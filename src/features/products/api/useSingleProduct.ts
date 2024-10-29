@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserProvider";
+import { useToast } from "@/hooks/use-toast";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -23,6 +24,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/";
 
 export default function useSingleProduct(id: string | string[]) {
     const queryClient = useQueryClient();
+    const { toast } = useToast();
     const { user } = useUser();
     const { token } = user;
     const fetchProduct = async (): Promise<Product> => {
@@ -53,7 +55,6 @@ export default function useSingleProduct(id: string | string[]) {
             body: data,
             headers: {
                 Authorization: `Bearer ${token}`,
-                // Don't set Content-Type header, let the browser set it automatically for FormData
             },
         });
         if (!res.ok) {
@@ -74,7 +75,20 @@ export default function useSingleProduct(id: string | string[]) {
     } = useMutation({
         mutationFn: deleteProduct,
         onSuccess: () => {
+            toast({
+                title: "Created Product",
+                description: "Product Created Successfully",
+            });
+
             queryClient.invalidateQueries({ queryKey: ["products"] });
+        },
+        onError: (error) => {
+            toast({
+                title: "Error",
+                description: "Failed to create product. Please try again.",
+                variant: "destructive",
+            });
+            console.error("Error creating product:", error);
         },
     });
 

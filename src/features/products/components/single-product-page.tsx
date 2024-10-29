@@ -3,7 +3,6 @@ import { useParams } from "next/navigation";
 import React from "react";
 import useSingleProduct from "../api/useSingleProduct";
 import { ArrowLeftIcon, LoaderCircle, Package } from "lucide-react";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,9 @@ export default function SingleProductPage() {
     const { id } = useParams();
 
     const { data, isLoading, isError } = useSingleProduct(id);
-    console.log(data);
+
+    const imagePath = data?.image.split("\\").pop();
+    console.log(imagePath);
 
     if (isLoading) {
         return (
@@ -40,11 +41,9 @@ export default function SingleProductPage() {
             </Button>
             <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                        // src="https://techarc.pk/wp-content/uploads/2023/10/Boost-Sonic-Bluetooth-Headphone.jpg"
-                        src={
-                            "D:/portfolio-projects/audio-phile/server/uploads/image-1730101390467-142550309.jpg"
-                        }
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_PATH_PREFIX}/${imagePath}`}
                         alt={data?.name || ""}
                         className="w-full h-auto object-cover rounded-lg shadow-lg p-4"
                     />
