@@ -71,7 +71,6 @@ export default function ProductForm() {
             }
         });
         createProductMutation(formData);
-
         form.reset();
         setImagePreview(null);
     }
