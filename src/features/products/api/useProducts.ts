@@ -45,12 +45,14 @@ export default function useProducts() {
 
         const res = await fetch(url.toString());
         if (!res.ok) {
-            throw new Error("Network response was not ok");
+            const data = await res.json();
+            console.log(data);
+            throw new Error(data.error.message);
         }
         return res.json();
     };
 
-    const { data, isLoading, isError } = useQuery<
+    const { data, isLoading, isError, error } = useQuery<
         ProductsResponse,
         Error,
         ProductsResponse,
@@ -69,6 +71,7 @@ export default function useProducts() {
     return {
         products: data?.data ?? [],
         totalPages: data?.meta.totalPages ?? 0,
+        productFetchError: error,
         currentPage: data?.meta.currentPage ?? 1,
         totalItems: data?.meta.totalItems ?? 0,
         pageSize: data?.meta.pageSize ?? itemsPerPage,

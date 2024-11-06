@@ -38,15 +38,12 @@ export default function ProductsTable() {
         setSearchTerm,
         isLoading,
         isError,
+        productFetchError,
     } = useProducts();
 
     const { isDeleting } = useSingleProduct("");
 
     const [inputValue, setInputValue] = useState("");
-
-    const handleView = (id: number) => {
-        console.log(`View item ${id}`);
-    };
 
     const handleEdit = (id: number) => {
         console.log(`Edit item ${id}`);
@@ -63,7 +60,8 @@ export default function ProductsTable() {
             return (
                 <div className="flex-grow flex items-center justify-center">
                     <p className="text-red-500">
-                        Something went wrong. Please try again later.
+                        {productFetchError?.message ??
+                            "Something went wrong. Please try again later."}
                     </p>
                 </div>
             );
@@ -127,9 +125,6 @@ export default function ProductsTable() {
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
-                                                    onClick={() =>
-                                                        handleView(item.id)
-                                                    }
                                                 >
                                                     <Eye className="h-4 w-4" />
                                                 </Button>

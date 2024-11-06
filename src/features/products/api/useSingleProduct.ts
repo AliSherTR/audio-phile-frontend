@@ -72,6 +72,7 @@ export default function useSingleProduct(id: string | string[]) {
         mutate: deleteProductMutation,
         isPending: isDeleting,
         isSuccess: isDeleted,
+        error,
     } = useMutation({
         mutationFn: deleteProduct,
         onSuccess: () => {
@@ -113,5 +114,6 @@ export default function useSingleProduct(id: string | string[]) {
         isCreating,
         isCreated,
         createProductMutation,
+        createProductError: error,
     };
 }

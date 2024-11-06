@@ -34,7 +34,8 @@ type FormValues = z.infer<typeof productSchema>;
 export default function ProductForm() {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-    const { createProductMutation, isCreating } = useSingleProduct("");
+    const { createProductMutation, isCreating, createProductError } =
+        useSingleProduct("");
 
     const form = useForm<FormValues>({
         resolver: zodResolver(productSchema),
@@ -92,6 +93,14 @@ export default function ProductForm() {
         return (
             <div className=" h-screen flex items-center justify-center">
                 <LoaderIcon className="animate-spin" />
+            </div>
+        );
+    }
+
+    if (createProductError) {
+        return (
+            <div className=" h-screen flex items-center justify-center">
+                {createProductError.message}
             </div>
         );
     }
