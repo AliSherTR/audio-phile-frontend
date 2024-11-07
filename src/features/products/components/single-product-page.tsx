@@ -13,7 +13,6 @@ export default function SingleProductPage() {
     const { data, isLoading, isError } = useSingleProduct(id);
 
     const imagePath = data?.image.split("\\").pop();
-    console.log(imagePath);
 
     if (isLoading) {
         return (
