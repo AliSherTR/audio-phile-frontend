@@ -8,9 +8,14 @@ interface Product {
     id: number;
     name: string;
     description: string;
-    price: string;
+    price: number;
     stock: number;
     category: string;
+    accessories: [""];
+    isFeatured: boolean;
+    image: string;
+    features: string;
+    isPromoted: boolean;
 }
 
 interface ProductsResponse {
