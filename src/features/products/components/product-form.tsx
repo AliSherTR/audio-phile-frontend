@@ -106,7 +106,6 @@ export default function ProductForm() {
 
     return (
         <div className="p-6">
-            <h2 className="text-2xl font-bold mb-6">Add New Product</h2>
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
@@ -153,7 +152,7 @@ export default function ProductForm() {
                         name="stock"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Product Price</FormLabel>
+                                <FormLabel>Stock</FormLabel>
                                 <FormControl>
                                     <Input
                                         type="number"
