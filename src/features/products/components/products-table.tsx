@@ -14,7 +14,12 @@ import {
 import useProducts from "../api/useProducts";
 import useSingleProduct from "../api/useSingleProduct";
 import DeleteProductModal from "./product-delete-modal";
-import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import ProductForm from "./product-form";
 import {
     Table,
@@ -28,6 +33,7 @@ import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import EditProduct from "./update-product";
 
 export default function ProductsTable() {
     const {
@@ -130,15 +136,30 @@ export default function ProductsTable() {
                                                 </Button>
                                             </Link>
 
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                onClick={() =>
-                                                    handleEdit(item.id)
-                                                }
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        onClick={() =>
+                                                            handleEdit(item.id)
+                                                        }
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                </DialogTrigger>
+
+                                                <DialogContent className="sm:max-w-[425px] md:max-w-[700px] lg:max-w-[1200px]">
+                                                    <DialogTitle className="text-2xl font-bold mb-6">
+                                                        Update Product
+                                                    </DialogTitle>
+                                                    <ScrollArea className="h-[80vh] pr-4">
+                                                        <EditProduct
+                                                            product={item}
+                                                        />
+                                                    </ScrollArea>
+                                                </DialogContent>
+                                            </Dialog>
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
                                                     <Button variant="outline">
@@ -203,6 +224,9 @@ export default function ProductsTable() {
                             <Button variant="outline">Add Product</Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px] md:max-w-[700px] lg:max-w-[1200px]">
+                            <DialogTitle className="text-2xl font-bold mb-6">
+                                Add New Product
+                            </DialogTitle>
                             <ScrollArea className="h-[80vh] pr-4">
                                 <ProductForm />
                             </ScrollArea>
