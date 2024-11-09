@@ -25,61 +25,48 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { X, Upload, LoaderIcon } from "lucide-react";
-import { productSchema } from "@/schemas";
+import { X, Upload } from "lucide-react";
 import useSingleProduct from "../api/useSingleProduct";
 
-interface Product {
-    id: number;
-    name: string;
-    price: number;
-    description: string;
-    accessories: string[];
-    category: string;
-    isFeatured: boolean;
-    image: string;
-    features: string;
-    stock: number;
-    isPromoted: boolean;
-}
+const productSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    price: z.string().min(1, "Price is required"),
+    description: z.string().min(1, "Description is required"),
+    features: z.string().min(1, "Features are required"),
+    category: z.string().min(1, "Category is required"),
+    stock: z.string().min(1, "Stock is required"),
+    isPromoted: z.boolean(),
+    isFeatured: z.boolean(),
+    accessories: z.array(z.string()),
+    image: z.any(),
+});
 
 type FormValues = z.infer<typeof productSchema>;
 
-export default function EditProduct({
-    product = {
-        id: 0,
-        name: "",
-        price: 0,
-        description: "",
-        accessories: [],
-        category: "",
-        isFeatured: false,
-        image: "",
-        features: "",
-        stock: 0,
-        isPromoted: false,
-    },
-}: {
-    product?: Product;
-}) {
+interface Product extends FormValues {
+    id: number;
+}
+
+export default function EditProduct({ product }: { product: Product }) {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-    const { isCreating, createProductError } = useSingleProduct("");
+    const { updateProductMutation, isUpdating } = useSingleProduct(
+        product.id.toString()
+    );
 
     const form = useForm<FormValues>({
         resolver: zodResolver(productSchema),
         defaultValues: {
-            name: product.name || "Sample Product",
-            price: JSON.stringify(product.price) || "99.99",
-            description:
-                product.description || "This is a sample product description.",
-            features: product.features || "Feature 1\nFeature 2\nFeature 3",
-            category: product.category || "Headphones",
-            isPromoted: product.isPromoted || false,
-            isFeatured: product.isFeatured || false,
-            accessories: product.accessories || ["Accessory 1", "Accessory 2"],
-            image: product.image || "",
-            stock: JSON.stringify(product.stock) || "100",
+            name: product.name,
+            price: product.price.toString(),
+            description: product.description,
+            features: product.features,
+            category: product.category,
+            isPromoted: product.isPromoted,
+            isFeatured: product.isFeatured,
+            accessories: product.accessories,
+            image: product.image,
+            stock: product.stock.toString(),
         },
     });
 
@@ -88,15 +75,32 @@ export default function EditProduct({
         name: "accessories",
     });
 
-    async function onSubmit(values: FormValues) {
-        // Your existing onSubmit logic here
-    }
-    const imagePath = product?.image.split("\\").pop();
     useEffect(() => {
-        setImagePreview(
-            `${process.env.NEXT_PUBLIC_IMAGE_PATH_PREFIX}/${imagePath}`
-        );
-    }, []);
+        if (product.image) {
+            setImagePreview(
+                `${process.env.NEXT_PUBLIC_IMAGE_PATH_PREFIX}/${product.image
+                    .split("\\")
+                    .pop()}`
+            );
+        }
+    }, [product.image]);
+
+    async function onSubmit(values: FormValues) {
+        const formData = new FormData();
+
+        Object.entries(values).forEach(([key, value]) => {
+            if (key === "accessories") {
+                formData.append(key, JSON.stringify(value));
+            } else if (key === "image" && value instanceof FileList) {
+                formData.append(key, value[0]);
+            } else {
+                formData.append(key, value?.toString() ?? "");
+            }
+        });
+
+        updateProductMutation({ id: product.id, data: formData });
+    }
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -109,22 +113,6 @@ export default function EditProduct({
             setImagePreview(null);
         }
     };
-
-    if (isCreating) {
-        return (
-            <div className="h-screen flex items-center justify-center">
-                <LoaderIcon className="animate-spin" />
-            </div>
-        );
-    }
-
-    if (createProductError) {
-        return (
-            <div className="h-screen flex items-center justify-center">
-                {createProductError.message}
-            </div>
-        );
-    }
 
     return (
         <div className="p-6">
@@ -361,12 +349,7 @@ export default function EditProduct({
                                             {imagePreview ? (
                                                 // eslint-disable-next-line @next/next/no-img-element
                                                 <img
-                                                    src={
-                                                        imagePreview ||
-                                                        (product.image
-                                                            ? `${process.env.NEXT_PUBLIC_IMAGE_PATH_PREFIX}/${imagePath}`
-                                                            : "")
-                                                    }
+                                                    src={imagePreview}
                                                     alt="Preview"
                                                     className="w-full h-full object-contain"
                                                 />
@@ -406,9 +389,9 @@ export default function EditProduct({
                     <Button
                         type="submit"
                         className="w-full"
-                        disabled={isCreating}
+                        disabled={isUpdating}
                     >
-                        Submit
+                        Update Product
                     </Button>
                 </form>
             </Form>

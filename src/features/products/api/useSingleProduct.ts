@@ -63,6 +63,27 @@ export default function useSingleProduct(id: string | string[]) {
         return res.json();
     };
 
+    const updateProduct = async ({
+        id,
+        data,
+    }: {
+        id: number;
+        data: FormData;
+    }) => {
+        const res = await fetch(`${API_URL}/${id}`, {
+            method: "PATCH",
+            body: data,
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (!res.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        return res.json();
+    };
+
     const { data, isLoading, isError } = useQuery({
         queryKey: ["product", id],
         queryFn: fetchProduct,
@@ -104,6 +125,25 @@ export default function useSingleProduct(id: string | string[]) {
         },
     });
 
+    const { mutate: updateProductMutation, isPending: isUpdating } =
+        useMutation({
+            mutationFn: updateProduct,
+            onSuccess: () => {
+                toast({
+                    title: "Updated Product",
+                    description: "Product Updated Successfully",
+                });
+                queryClient.invalidateQueries({ queryKey: ["products"] });
+            },
+            onError: () => {
+                toast({
+                    title: "Error",
+                    description: "Failed to update product. Please try again.",
+                    variant: "destructive",
+                });
+            },
+        });
+
     return {
         data: data?.data,
         isLoading,
@@ -115,5 +155,7 @@ export default function useSingleProduct(id: string | string[]) {
         isCreated,
         createProductMutation,
         createProductError: error,
+        updateProductMutation,
+        isUpdating,
     };
 }
