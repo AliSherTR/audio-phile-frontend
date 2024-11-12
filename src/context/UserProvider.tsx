@@ -73,7 +73,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
     const loginUser = async (email: string, password: string) => {
         try {
-            const res = await fetch("http://localhost:8000/signin", {
+            const res = await fetch("http://localhost:8000/auth/signin", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

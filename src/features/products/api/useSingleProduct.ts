@@ -20,7 +20,7 @@ interface Product {
     status: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/";
+const API_URL = "http://localhost:8000/products";
 
 export default function useSingleProduct(id: string | string[]) {
     const queryClient = useQueryClient();

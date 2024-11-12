@@ -24,7 +24,7 @@ interface UserResponse {
 }
 
 export default function useUsers() {
-    const API_URL = "http://localhost:8000/all-users";
+    const API_URL = "http://localhost:8000/users/all-users";
     const { user } = useUser();
     const { token } = user;
     const [page, setPage] = useState(1);

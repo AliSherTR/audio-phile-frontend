@@ -28,8 +28,7 @@ interface ProductsResponse {
     };
 }
 
-const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/products";
+const API_URL = "http://localhost:8000/products";
 
 export default function useProducts() {
     const [page, setPage] = useState(1);
@@ -50,9 +49,7 @@ export default function useProducts() {
 
         const res = await fetch(url.toString());
         if (!res.ok) {
-            const data = await res.json();
-            console.log(data);
-            throw new Error(data.error.message);
+            throw new Error("Something went Wrong");
         }
         return res.json();
     };
