@@ -55,7 +55,7 @@ export default function ProductForm() {
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
-        name: "boxItems",
+        name: "accessories",
     });
 
     async function onSubmit(values: FormValues) {
