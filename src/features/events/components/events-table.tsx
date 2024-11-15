@@ -13,6 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Eye, Pencil, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import EventForm from "./event-form";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Sample data for the events
 const allEvents = [
@@ -31,70 +35,6 @@ const allEvents = [
         time: "09:00",
         status: "Open",
         attendees: 1000,
-    },
-    {
-        id: "EVT003",
-        name: "Charity Gala Dinner",
-        date: "2023-09-05",
-        time: "19:30",
-        status: "Sold Out",
-        attendees: 250,
-    },
-    {
-        id: "EVT004",
-        name: "Local Art Exhibition",
-        date: "2023-07-22",
-        time: "10:00",
-        status: "Upcoming",
-        attendees: 300,
-    },
-    {
-        id: "EVT005",
-        name: "Marathon for a Cause",
-        date: "2023-10-01",
-        time: "07:00",
-        status: "Open",
-        attendees: 2000,
-    },
-    {
-        id: "EVT006",
-        name: "Food and Wine Festival",
-        date: "2023-08-20",
-        time: "12:00",
-        status: "Upcoming",
-        attendees: 1500,
-    },
-    {
-        id: "EVT007",
-        name: "Business Networking Mixer",
-        date: "2023-09-15",
-        time: "18:30",
-        status: "Open",
-        attendees: 150,
-    },
-    {
-        id: "EVT008",
-        name: "Children's Book Fair",
-        date: "2023-07-29",
-        time: "10:00",
-        status: "Upcoming",
-        attendees: 400,
-    },
-    {
-        id: "EVT009",
-        name: "Yoga and Wellness Retreat",
-        date: "2023-08-05",
-        time: "08:00",
-        status: "Sold Out",
-        attendees: 100,
-    },
-    {
-        id: "EVT010",
-        name: "Classic Car Show",
-        date: "2023-09-23",
-        time: "11:00",
-        status: "Open",
-        attendees: 800,
     },
 ];
 
@@ -137,7 +77,7 @@ export default function EventsTable() {
     return (
         <div className="container mx-auto py-10">
             <h1 className="text-2xl font-bold mb-4">Events</h1>
-            <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between">
                 <Input
                     type="text"
                     placeholder="Search events by name"
@@ -145,6 +85,16 @@ export default function EventsTable() {
                     onChange={handleSearch}
                     className="max-w-sm"
                 />
+                <Dialog>
+                    <DialogTrigger>Add New Event</DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px] md:max-w-[700px] lg:max-w-[1200px] ">
+                        <ScrollArea className="h-[80vh] pr-4">
+                            <DialogTitle>Create A New Event</DialogTitle>
+
+                            <EventForm />
+                        </ScrollArea>
+                    </DialogContent>
+                </Dialog>
             </div>
             <div className="border rounded-lg overflow-hidden">
                 <Table>
