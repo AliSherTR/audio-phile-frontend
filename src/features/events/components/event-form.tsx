@@ -24,9 +24,10 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { useEvents } from "../api/useEvents";
 
 const eventSchema = z.object({
-    eventName: z.string().min(1, "Event name is required"),
+    name: z.string().min(1, "Event name is required"),
     startDate: z.date({
         required_error: "Start date is required",
     }),
@@ -34,7 +35,7 @@ const eventSchema = z.object({
         required_error: "End date is required",
     }),
     productId: z.string().min(1, "Product ID is required"),
-    eventImage: z.instanceof(File).optional(),
+    image: z.instanceof(File).optional(),
 });
 
 type EventFormData = z.infer<typeof eventSchema>;
@@ -42,17 +43,32 @@ type EventFormData = z.infer<typeof eventSchema>;
 export default function EventForm() {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+    const {createEventMutation , creatingEvent} = useEvents()
+
     const form = useForm<EventFormData>({
         resolver: zodResolver(eventSchema),
         defaultValues: {
-            eventName: "",
+            name: "",
             productId: "",
+            startDate: new Date,
+            endDate: new Date,
+            image: "",
         },
     });
 
     const onSubmit = (data: EventFormData) => {
-        console.log(data);
-        // Handle form submission here
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+            if (key === "accessories") {
+                formData.append(key, JSON.stringify(value));
+            } else if (key === "image" && value instanceof FileList) {
+                formData.append(key, value[0]);
+            } else {
+                formData.append(key, value?.toString() ?? "");
+            }
+        });
+        const dataToSend = {...formData , discount: 20}
+        createEventMutation(dataToSend)
     };
 
     useEffect(() => {
@@ -73,7 +89,7 @@ export default function EventForm() {
                     <div className="">
                         <FormField
                             control={form.control}
-                            name="eventImage"
+                            name="image"
                             render={({ field }) => (
                                 <FormItem className="col-span-full">
                                     <FormLabel className="text-lg font-semibold">
@@ -146,7 +162,7 @@ export default function EventForm() {
                         <div className="space-y-6">
                             <FormField
                                 control={form.control}
-                                name="eventName"
+                                name="name"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Event Name</FormLabel>
