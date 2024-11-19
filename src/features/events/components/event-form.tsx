@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -5,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import { CalendarIcon, Upload, X } from "lucide-react";
+import { CalendarIcon, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,50 +27,53 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useEvents } from "../api/useEvents";
-
-const eventSchema = z.object({
-    name: z.string().min(1, "Event name is required"),
-    startDate: z.date({
-        required_error: "Start date is required",
-    }),
-    endDate: z.date({
-        required_error: "End date is required",
-    }),
-    productId: z.string().min(1, "Product ID is required"),
-    image: z.instanceof(File).optional(),
-});
+import { eventSchema } from "@/schemas";
 
 type EventFormData = z.infer<typeof eventSchema>;
 
 export default function EventForm() {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-    const {createEventMutation , creatingEvent} = useEvents()
+    const { createEventMutation } = useEvents();
 
     const form = useForm<EventFormData>({
         resolver: zodResolver(eventSchema),
         defaultValues: {
             name: "",
             productId: "",
-            startDate: new Date,
-            endDate: new Date,
-            image: "",
+            startDate: new Date(),
+            endDate: new Date(),
+            image: null,
+            discount: "",
         },
     });
 
     const onSubmit = (data: EventFormData) => {
         const formData = new FormData();
         Object.entries(data).forEach(([key, value]) => {
-            if (key === "accessories") {
-                formData.append(key, JSON.stringify(value));
-            } else if (key === "image" && value instanceof FileList) {
+            if (key === "image" && value instanceof FileList) {
                 formData.append(key, value[0]);
             } else {
                 formData.append(key, value?.toString() ?? "");
             }
         });
-        const dataToSend = {...formData , discount: 20}
-        createEventMutation(dataToSend)
+        console.log(formData);
+        const dataToSend = { ...formData, discount: 20 };
+        console.log(dataToSend);
+        createEventMutation(formData);
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setImagePreview(null);
+        }
     };
 
     useEffect(() => {
@@ -90,69 +95,53 @@ export default function EventForm() {
                         <FormField
                             control={form.control}
                             name="image"
-                            render={({ field }) => (
-                                <FormItem className="col-span-full">
-                                    <FormLabel className="text-lg font-semibold">
-                                        Event Image
-                                    </FormLabel>
+                            render={({
+                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                field: { value, onChange, ...field },
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Event Image</FormLabel>
                                     <FormControl>
-                                        <div className="flex items-center justify-center h-80 bg-muted rounded-lg overflow-hidden border-2 border-dashed border-gray-300 transition-all duration-200 ease-in-out hover:border-primary">
-                                            {imagePreview ? (
-                                                <div className="relative w-full h-full">
+                                        <div className="flex flex-col items-center justify-center w-full">
+                                            <Label
+                                                htmlFor="dropzone-file"
+                                                className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                                            >
+                                                {imagePreview ? (
+                                                    // eslint-disable-next-line @next/next/no-img-element
                                                     <img
                                                         src={imagePreview}
-                                                        alt="Event preview"
-                                                        className="object-contain w-full h-full"
+                                                        alt="Preview"
+                                                        className="w-full h-full object-contain"
                                                     />
-                                                    <Button
-                                                        type="button"
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        className="absolute top-2 right-2"
-                                                        onClick={() => {
-                                                            setImagePreview(
-                                                                null
-                                                            );
-                                                            field.onChange(
-                                                                null
-                                                            );
-                                                        }}
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <Label
-                                                    htmlFor="event-image-upload"
-                                                    className="cursor-pointer flex flex-col items-center justify-center w-full h-full"
-                                                >
-                                                    <Upload className="w-16 h-16 text-muted-foreground mb-4" />
-                                                    <span className="text-lg font-medium text-muted-foreground">
-                                                        Click to upload image
-                                                    </span>
-                                                    <span className="text-sm text-muted-foreground mt-2">
-                                                        or drag and drop
-                                                    </span>
-                                                </Label>
-                                            )}
-                                            <Input
-                                                id="event-image-upload"
-                                                type="file"
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    const file =
-                                                        e.target.files?.[0];
-                                                    if (file) {
-                                                        field.onChange(file);
-                                                        setImagePreview(
-                                                            URL.createObjectURL(
-                                                                file
-                                                            )
+                                                ) : (
+                                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                        <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
+                                                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                                            <span className="font-semibold">
+                                                                Click to upload
+                                                            </span>{" "}
+                                                            or drag and drop
+                                                        </p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                            SVG, PNG, JPG or GIF
+                                                            (MAX. 800x400px)
+                                                        </p>
+                                                    </div>
+                                                )}
+                                                <Input
+                                                    id="dropzone-file"
+                                                    type="file"
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        onChange(
+                                                            e.target.files
                                                         );
-                                                    }
-                                                }}
-                                            />
+                                                        handleImageChange(e);
+                                                    }}
+                                                    {...field}
+                                                />
+                                            </Label>
                                         </div>
                                     </FormControl>
                                     <FormMessage />
@@ -292,6 +281,23 @@ export default function EventForm() {
                                         <FormControl>
                                             <Input
                                                 placeholder="Enter product ID"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="discount"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Product Discount</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Enter discount percentage"
                                                 {...field}
                                             />
                                         </FormControl>
