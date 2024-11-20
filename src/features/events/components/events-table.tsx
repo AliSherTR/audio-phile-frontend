@@ -10,18 +10,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Eye, Pencil, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import {
+    Eye,
+    Pencil,
+    ChevronLeft,
+    ChevronRight,
+    Trash2,
+    Loader,
+} from "lucide-react";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import EventForm from "./event-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Events, useEvents } from "../api/useEvents";
 import { format } from "date-fns";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import DeleteEventModal from "./delete-event-modal";
 
 export default function EventsTable() {
-    const { events } = useEvents();
+    const { events, isDeleting } = useEvents();
 
-    const getEventStatus = (startDate: string, endDate: string) => {
+    const getEventStatus = (startDate: Date, endDate: Date) => {
         const currentDate = new Date();
         const start = new Date(startDate);
         const end = new Date(endDate);
@@ -70,6 +79,8 @@ export default function EventsTable() {
             );
         }
 
+        if (isDeleting) return <Loader className=" animate-spin" />;
+
         return (
             <>
                 <div className="border rounded-lg overflow-hidden">
@@ -85,32 +96,60 @@ export default function EventsTable() {
                         </TableHeader>
                         <TableBody>
                             {events.map((event: Events) => {
-                                const status = getEventStatus(event.startDate, event.endDate);
+                                const status = getEventStatus(
+                                    event.startDate,
+                                    event.endDate
+                                );
 
                                 return (
                                     <TableRow key={event.id}>
-                                        <TableCell className="font-medium">{event.name}</TableCell>
-                                        <TableCell>{formatDate(event.startDate)}</TableCell>
-                                        <TableCell>{formatDate(event.endDate)}</TableCell>
+                                        <TableCell className="font-medium">
+                                            {event.name}
+                                        </TableCell>
                                         <TableCell>
-                                            <Badge className={`${getStatusColor(status)} font-semibold`}>
+                                            {formatDate(event.startDate)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatDate(event.endDate)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                className={`${getStatusColor(
+                                                    status
+                                                )} font-semibold`}
+                                            >
                                                 {status}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex space-x-2">
-                                                <Button variant="outline" size="sm">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                >
                                                     <Eye className="h-4 w-4 mr-1" />
                                                     View
                                                 </Button>
-                                                <Button variant="outline" size="sm">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                >
                                                     <Pencil className="h-4 w-4 mr-1" />
                                                     Edit
                                                 </Button>
-                                                <Button variant="outline" size="sm">
-                                                    <Calendar className="h-4 w-4 mr-1" />
-                                                    Schedule
-                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button variant="outline">
+                                                            <Trash2 className="h4 w-4 mr-1" />
+                                                            Delete
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <DeleteEventModal
+                                                        id={JSON.stringify(
+                                                            event.id
+                                                        )}
+                                                    />
+                                                </AlertDialog>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -146,7 +185,9 @@ export default function EventsTable() {
                     className="max-w-sm"
                 />
                 <Dialog>
-                    <DialogTrigger>Add New Event</DialogTrigger>
+                    <Button variant={"outline"}>
+                        <DialogTrigger>Add New Event</DialogTrigger>{" "}
+                    </Button>
                     <DialogContent className="sm:max-w-[425px] md:max-w-[700px] lg:max-w-[1200px]">
                         <ScrollArea className="h-[80vh] pr-4">
                             <DialogTitle>Create A New Event</DialogTitle>
@@ -161,4 +202,3 @@ export default function EventsTable() {
         </>
     );
 }
-

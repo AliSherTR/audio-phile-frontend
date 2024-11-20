@@ -19,8 +19,8 @@ interface Product {
 export interface Events {
     id: string;
     name: string;
-    startDate: string;
-    endDate: string;
+    startDate: Date;
+    endDate: Date;
     image: string;
     product: Product | null;
 }
@@ -62,6 +62,23 @@ export const useEvents = () => {
         return res.json();
     };
 
+    const deleteEvent = async (id: string) => {
+        const res = await fetch(`${API_URL}/${id}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.message);
+        }
+
+        return data;
+    };
+
     const {
         data: events,
         isLoading: eventsLoading,
@@ -93,11 +110,33 @@ export const useEvents = () => {
             },
         });
 
+    const { mutate: deleteEventMutation, isPending: isDeleting } = useMutation({
+        mutationFn: deleteEvent,
+        onSuccess: () => {
+            toast({
+                title: "Deleted Event",
+                description: "Event Deleted Successfully",
+            });
+
+            queryClient.invalidateQueries({ queryKey: ["events"] });
+        },
+        onError: (error) => {
+            toast({
+                title: "Error",
+                description:
+                    "Failed to Delete event. Please try again." + error.message,
+                variant: "destructive",
+            });
+        },
+    });
+
     return {
         events: events?.data ?? [],
         eventsError,
         eventsLoading,
         createEventMutation,
         creatingEvent,
+        deleteEventMutation,
+        isDeleting,
     };
 };

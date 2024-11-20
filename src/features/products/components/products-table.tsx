@@ -99,7 +99,6 @@ export default function ProductsTable() {
         return (
             <>
                 <div className="overflow-x-auto">
-                    <div></div>
                     <Table className="w-full">
                         <TableHeader>
                             <TableRow>
