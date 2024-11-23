@@ -48,10 +48,12 @@ export default function useProducts() {
         if (search) url.searchParams.append("search", search);
 
         const res = await fetch(url.toString());
+
+        const data = await res.json();
         if (!res.ok) {
-            throw new Error("Something went Wrong");
+            throw new Error(data.message);
         }
-        return res.json();
+        return data;
     };
 
     const { data, isLoading, isError, error } = useQuery<

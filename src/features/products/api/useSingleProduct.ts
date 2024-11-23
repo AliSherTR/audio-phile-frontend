@@ -77,11 +77,13 @@ export default function useSingleProduct(id: string | string[]) {
                 Authorization: `Bearer ${token}`,
             },
         });
+
+        const apiData = await res.json();
         if (!res.ok) {
-            throw new Error("Network response was not ok");
+            throw new Error(apiData.message);
         }
 
-        return res.json();
+        return apiData;
     };
 
     const { data, isLoading, isError } = useQuery({
@@ -99,7 +101,7 @@ export default function useSingleProduct(id: string | string[]) {
         onSuccess: () => {
             toast({
                 title: "Created Product",
-                description: "Product Created Successfully",
+                description: "Product Deleted Successfully",
             });
 
             queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -107,7 +109,7 @@ export default function useSingleProduct(id: string | string[]) {
         onError: (error) => {
             toast({
                 title: "Error",
-                description: "Failed to create product. Please try again.",
+                description: "Failed to Delete product. Please try again.",
                 variant: "destructive",
             });
             console.error("Error creating product:", error);
