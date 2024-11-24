@@ -20,16 +20,16 @@ export default function DashboardLayout({
     return (
         <UserProvider>
             <QueryClientProvider client={queryClient}>
-                <div className="h-screen flex flex-col md:grid md:grid-rows-[auto_1fr] md:grid-cols-12 overflow-hidden">
+                <div className="h-screen flex flex-col md:grid md:grid-rows-[auto_1fr] md:grid-cols-12">
                     {/* Mobile Header */}
                     <div className="md:hidden">
                         <Header />
                         <Button
                             variant="ghost"
                             size="icon"
-                            className={`absolute  ${
-                                sideBarOpen ? " top-0" : "top-4"
-                            }  z-50`}
+                            className={`absolute ${
+                                sideBarOpen ? "top-0" : "top-4"
+                            } z-50`}
                             onClick={() => setSideBarOpen(!sideBarOpen)}
                         >
                             <Menu className="h-6 w-6" />
@@ -42,11 +42,11 @@ export default function DashboardLayout({
                         className={`fixed inset-y-0 left-0 transform ${
                             sideBarOpen ? "translate-x-0" : "-translate-x-full"
                         } md:relative md:translate-x-0 transition-all duration-300 ease-in-out z-30 
-        ${
-            sideBarOpen
-                ? "md:col-span-3 lg:col-span-2 xl:col-span-2"
-                : "md:col-span-1 lg:col-span-1 xl:col-span-1"
-        } md:row-span-full`}
+                        ${
+                            sideBarOpen
+                                ? "md:col-span-3 lg:col-span-2 xl:col-span-2"
+                                : "md:col-span-1 lg:col-span-1 xl:col-span-1"
+                        } md:row-span-full`}
                     >
                         <SideBar
                             sideBarOpen={sideBarOpen}
@@ -60,7 +60,7 @@ export default function DashboardLayout({
                             sideBarOpen
                                 ? "md:col-span-9 lg:col-span-10 xl:col-span-10"
                                 : "md:col-span-11 lg:col-span-11 xl:col-span-11"
-                        } md:row-span-full w-full transition-all duration-300 ease-in-out`}
+                        } md:row-span-full w-full transition-all duration-300 ease-in-out overflow-hidden`}
                     >
                         {/* Desktop Header */}
                         <div className="hidden md:block">
@@ -68,7 +68,7 @@ export default function DashboardLayout({
                         </div>
 
                         {/* Main Content */}
-                        <main className="flex-grow overflow-auto custom-scrollbar px-4 py-6 md:px-8 md:py-12">
+                        <main className="flex-grow overflow-auto px-4 py-6 md:px-8 md:py-12">
                             {children}
                         </main>
                     </div>

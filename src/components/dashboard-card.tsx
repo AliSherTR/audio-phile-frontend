@@ -7,16 +7,30 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-export default function DashBoardCard() {
+
+interface Props {
+    heading: string;
+    content: string;
+    footer: string;
+    icon?: React.ReactElement;
+}
+
+export default function DashBoardCard({
+    heading,
+    content,
+    footer,
+    icon,
+}: Props) {
     return (
         <Card className=" w-full">
             <CardHeader>
-                <CardDescription>Total Revenue</CardDescription>
+                <CardDescription>{heading}</CardDescription>
             </CardHeader>
-            <CardContent>
-                <CardTitle>$45,231.89</CardTitle>
+            <CardContent className=" flex gap-2 items-center">
+                {icon}
+                <CardTitle>{content}</CardTitle>
             </CardContent>
-            <CardFooter>+20.1% from last month</CardFooter>
+            <CardFooter>{footer}</CardFooter>
         </Card>
     );
 }

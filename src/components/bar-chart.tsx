@@ -44,8 +44,8 @@ export function Barchart() {
     return (
         <Card className=" w-full">
             <CardHeader>
-                <CardTitle>Bar Chart - Multiple</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
+                <CardTitle>Total Sales Data</CardTitle>
+                <CardDescription>From January 2024 - June 2024</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>

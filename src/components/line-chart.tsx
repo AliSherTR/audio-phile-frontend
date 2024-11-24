@@ -40,7 +40,7 @@ export function Linechart() {
     return (
         <Card className=" w-full">
             <CardHeader>
-                <CardTitle>Line Chart</CardTitle>
+                <CardTitle>Users Chart</CardTitle>
                 <CardDescription>January - June 2024</CardDescription>
             </CardHeader>
             <CardContent>
