@@ -55,11 +55,14 @@ export const useEvents = () => {
             },
         });
 
+        const apiResponse = await res.json()
+
+
         if (!res.ok) {
-            throw new Error("Something unexpected happened");
+            throw new Error(apiResponse.error.message);
         }
 
-        return res.json();
+        return apiResponse;
     };
 
     const deleteEvent = async (id: string) => {

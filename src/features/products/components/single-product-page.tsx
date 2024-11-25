@@ -59,9 +59,28 @@ export default function SingleProductPage() {
                 <div className="space-y-6">
                     <h1 className="text-3xl font-bold">{data?.name}</h1>
 
-                    <p className="text-2xl font-semibold text-gray-700">
-                        ${data?.price}
-                    </p>
+
+
+
+
+
+                    <div className="flex items-center gap-2">
+      {data?.discountedPrice ? (
+        <>
+          <p className="text-2xl font-semibold text-gray-700 line-through" aria-hidden="true">
+            ${data.price}
+          </p>
+          <p className="text-2xl font-semibold text-gray-700">
+            ${data.discountedPrice.toFixed(2)}
+          </p>
+          <span className="sr-only">Original price: ${data.price}, Discounted price: ${data.discountedPrice}</span>
+        </>
+      ) : (
+        <p className="text-2xl font-semibold text-gray-700">
+          ${data?.price.toFixed(2)}
+        </p>
+      )}
+    </div>
                     <p className="text-muted-foreground">{data?.description}</p>
                     <div className="flex items-center space-x-4">
                         <span className="text-sm text-muted-foreground">

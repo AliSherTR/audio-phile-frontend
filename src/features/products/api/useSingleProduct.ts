@@ -8,6 +8,7 @@ interface Product {
         id: number;
         name: string;
         price: number;
+        discountedPrice: number;
         description: string;
         accessories: string[];
         category: string;

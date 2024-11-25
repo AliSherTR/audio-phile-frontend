@@ -9,6 +9,7 @@ interface Product {
     name: string;
     description: string;
     price: number;
+    discountedPrice: number;
     stock: number;
     category: string;
     accessories: [""];
@@ -50,6 +51,7 @@ export default function useProducts() {
         const res = await fetch(url.toString());
 
         const data = await res.json();
+
         if (!res.ok) {
             throw new Error(data.message);
         }
