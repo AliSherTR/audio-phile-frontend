@@ -23,6 +23,7 @@ export interface Events {
     endDate: Date;
     image: string;
     product: Product | null;
+    productId: number
 }
 
 interface EventsResponse {
@@ -40,10 +41,14 @@ export const useEvents = () => {
 
     const fetchEvents = async (): Promise<EventsResponse> => {
         const res = await fetch(`${API_URL}/all-admin`);
+        const apiResponse = await res.json()
+       
+        console.log(apiResponse)
         if (!res.ok) {
-            throw new Error("No Events Found");
+            throw new Error(apiResponse.error.message);
         }
-        return res.json();
+
+        return apiResponse;
     };
 
     const createEvent = async (data: FormData) => {
@@ -56,7 +61,7 @@ export const useEvents = () => {
         });
 
         const apiResponse = await res.json()
-
+       
 
         if (!res.ok) {
             throw new Error(apiResponse.error.message);

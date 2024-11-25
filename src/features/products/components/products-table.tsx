@@ -47,8 +47,6 @@ export default function ProductsTable() {
         productFetchError,
     } = useProducts();
 
-
-
     const { isDeleting } = useSingleProduct("");
 
     const [inputValue, setInputValue] = useState("");
@@ -121,7 +119,12 @@ export default function ProductsTable() {
                                 <TableRow key={item.id}>
                                     <TableCell>{item.id}</TableCell>
                                     <TableCell>{item.name}</TableCell>
-                                    <TableCell>${item.discountedPrice ? item.discountedPrice: item.price}</TableCell>
+                                    <TableCell>
+                                        $
+                                        {item.discountedPrice
+                                            ? item.discountedPrice
+                                            : item.price}
+                                    </TableCell>
                                     <TableCell>{item.stock}</TableCell>
                                     <TableCell>{item.category}</TableCell>
                                     <TableCell>

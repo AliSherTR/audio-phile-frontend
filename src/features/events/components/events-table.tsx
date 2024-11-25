@@ -26,6 +26,7 @@ import { Events, useEvents } from "../api/useEvents";
 import { format } from "date-fns";
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import DeleteEventModal from "./delete-event-modal";
+import Link from "next/link";
 
 export default function EventsTable() {
     const { events, isDeleting } = useEvents();
@@ -123,25 +124,31 @@ export default function EventsTable() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex space-x-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
+                                                <Link
+                                                    href={`/dashboard/events/${event.id}/${event.productId}`}
+                                                    
                                                 >
-                                                    <Eye className="h-4 w-4 mr-1" />
-                                                    View
+                                                    <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className=" flex gap-3"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                   
                                                 </Button>
+                                                </Link>
                                                 <Button
                                                     variant="outline"
-                                                    size="sm"
+                                                    size="icon"
                                                 >
                                                     <Pencil className="h-4 w-4 mr-1" />
-                                                    Edit
+                                                    
                                                 </Button>
                                                 <AlertDialog>
                                                     <AlertDialogTrigger asChild>
                                                         <Button variant="outline">
                                                             <Trash2 className="h4 w-4 mr-1" />
-                                                            Delete
+                                                            
                                                         </Button>
                                                     </AlertDialogTrigger>
                                                     <DeleteEventModal
@@ -185,9 +192,12 @@ export default function EventsTable() {
                     className="max-w-sm"
                 />
                 <Dialog>
-                    <Button variant={"outline"}>
-                        <DialogTrigger>Add New Event</DialogTrigger>{" "}
+                <DialogTrigger asChild>
+
+                    <Button variant={"outline"} asChild>
+                       Add New Event
                     </Button>
+                </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px] md:max-w-[700px] lg:max-w-[1200px]">
                         <ScrollArea className="h-[80vh] pr-4">
                             <DialogTitle>Create A New Event</DialogTitle>

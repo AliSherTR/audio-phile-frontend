@@ -8,9 +8,9 @@ interface Product {
     id: number;
     name: string;
     description: string;
-    price: number;
+    price: string;
     discountedPrice: number;
-    stock: number;
+    stock: string;
     category: string;
     accessories: [""];
     isFeatured: boolean;
