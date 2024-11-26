@@ -58,8 +58,10 @@ export default function useSingleProduct(id: string | string[]) {
                 Authorization: `Bearer ${token}`,
             },
         });
+
+        const apiResponse = await res.json();
         if (!res.ok) {
-            throw new Error("Network response was not ok");
+            throw new Error(apiResponse.message);
         }
         return res.json();
     };
@@ -124,7 +126,17 @@ export default function useSingleProduct(id: string | string[]) {
     } = useMutation({
         mutationFn: createProduct,
         onSuccess: () => {
+            toast({
+                title: "Created Product",
+                description: "Product created successfully",
+            });
             queryClient.invalidateQueries({ queryKey: ["products"] });
+        },
+        onError: (error) => {
+            toast({
+                title: "Failed",
+                description: "Failed to create product " + error.message,
+            });
         },
     });
 
