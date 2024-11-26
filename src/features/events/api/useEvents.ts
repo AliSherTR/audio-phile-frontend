@@ -17,18 +17,24 @@ interface Product {
 }
 
 export interface Events {
-    id: string;
+    id: number;
     name: string;
     startDate: Date;
     endDate: Date;
     image: string;
     product: Product | null;
-    productId: number
+    productId: string;
+    discount: string;
 }
 
 interface EventsResponse {
     status: string;
     data: Events[];
+}
+
+interface UpdateEventParams {
+    id: number;
+    data: FormData;
 }
 
 export const useEvents = () => {
@@ -41,9 +47,7 @@ export const useEvents = () => {
 
     const fetchEvents = async (): Promise<EventsResponse> => {
         const res = await fetch(`${API_URL}/all-admin`);
-        const apiResponse = await res.json()
-       
-        console.log(apiResponse)
+        const apiResponse = await res.json();
         if (!res.ok) {
             throw new Error(apiResponse.error.message);
         }
@@ -60,8 +64,7 @@ export const useEvents = () => {
             },
         });
 
-        const apiResponse = await res.json()
-       
+        const apiResponse = await res.json();
 
         if (!res.ok) {
             throw new Error(apiResponse.error.message);
@@ -85,6 +88,24 @@ export const useEvents = () => {
         }
 
         return data;
+    };
+
+    const updateEvent = async ({ id, data }: UpdateEventParams) => {
+        const res = await fetch(`${API_URL}/${id}`, {
+            method: "PATCH",
+            body: data,
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const apiResponse = await res.json();
+
+        if (!res.ok) {
+            throw new Error(apiResponse.message);
+        }
+
+        return apiResponse;
     };
 
     const {
@@ -138,6 +159,30 @@ export const useEvents = () => {
         },
     });
 
+    const {
+        mutate: updateEventMutation,
+        isPending: isUpdating,
+        isSuccess: isUpdated,
+    } = useMutation({
+        mutationFn: updateEvent,
+        onSuccess: () => {
+            toast({
+                title: "Updated Event",
+                description: "Event Updated Successfully",
+            });
+
+            queryClient.invalidateQueries({ queryKey: ["events"] });
+        },
+        onError: (error) => {
+            toast({
+                title: "Error",
+                description:
+                    "Failed to Update event. Please try again." + error.message,
+                variant: "destructive",
+            });
+        },
+    });
+
     return {
         events: events?.data ?? [],
         eventsError,
@@ -146,5 +191,8 @@ export const useEvents = () => {
         creatingEvent,
         deleteEventMutation,
         isDeleting,
+        updateEventMutation,
+        isUpdating,
+        isUpdated,
     };
 };

@@ -61,7 +61,7 @@ export default function EventProductDisplay({
                 <div className="relative aspect-[4/3] w-full">
                     <Image
                         src={`http://localhost:8000/uploads/${imagePath(
-                            event.image
+                            product.image
                         )}`}
                         alt={product.name}
                         fill

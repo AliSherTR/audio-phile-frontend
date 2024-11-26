@@ -18,8 +18,12 @@ import {
     Trash2,
     Loader,
 } from "lucide-react";
-import { DialogTrigger } from "@radix-ui/react-dialog";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import EventForm from "./event-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Events, useEvents } from "../api/useEvents";
@@ -27,6 +31,7 @@ import { format } from "date-fns";
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import DeleteEventModal from "./delete-event-modal";
 import Link from "next/link";
+import EditEventForm from "./edit-event-form";
 
 export default function EventsTable() {
     const { events, isDeleting } = useEvents();
@@ -72,6 +77,8 @@ export default function EventsTable() {
 
     // Function to render content in the table
     const renderContent = () => {
+        if (!events) return;
+
         if (!events.length) {
             return (
                 <>
@@ -126,29 +133,42 @@ export default function EventsTable() {
                                             <div className="flex space-x-2">
                                                 <Link
                                                     href={`/dashboard/events/${event.id}/${event.productId}`}
-                                                    
                                                 >
                                                     <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className=" flex gap-3"
-                                                >
-                                                    <Eye className="h-4 w-4" />
-                                                   
-                                                </Button>
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className=" flex gap-3"
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Button>
                                                 </Link>
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                >
-                                                    <Pencil className="h-4 w-4 mr-1" />
-                                                    
-                                                </Button>
+
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                        >
+                                                            <Pencil className="h-4 w-4 mr-1" />
+                                                        </Button>
+                                                    </DialogTrigger>
+
+                                                    <DialogContent className="sm:max-w-[425px] md:max-w-[700px] lg:max-w-[1200px]">
+                                                        <ScrollArea className="h-[80vh] pr-4">
+                                                            <DialogTitle>
+                                                                Edit Event
+                                                            </DialogTitle>
+                                                            <EditEventForm
+                                                                event={event}
+                                                            />
+                                                        </ScrollArea>
+                                                    </DialogContent>
+                                                </Dialog>
+
                                                 <AlertDialog>
                                                     <AlertDialogTrigger asChild>
                                                         <Button variant="outline">
                                                             <Trash2 className="h4 w-4 mr-1" />
-                                                            
                                                         </Button>
                                                     </AlertDialogTrigger>
                                                     <DeleteEventModal
@@ -192,16 +212,12 @@ export default function EventsTable() {
                     className="max-w-sm"
                 />
                 <Dialog>
-                <DialogTrigger asChild>
-
-                    <Button variant={"outline"} asChild>
-                       Add New Event
-                    </Button>
-                </DialogTrigger>
+                    <DialogTrigger asChild>
+                        <Button variant={"outline"}>Add New Event</Button>
+                    </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px] md:max-w-[700px] lg:max-w-[1200px]">
                         <ScrollArea className="h-[80vh] pr-4">
                             <DialogTitle>Create A New Event</DialogTitle>
-
                             <EventForm />
                         </ScrollArea>
                     </DialogContent>

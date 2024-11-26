@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @next/next/no-img-element */
 "use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Events, useEvents } from "../api/useEvents";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,40 +24,32 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useEvents } from "../api/useEvents";
 import { eventSchema } from "@/schemas";
+
+interface Props {
+    event: Events;
+}
 
 type EventFormData = z.infer<typeof eventSchema>;
 
-export default function EventForm() {
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+export default function EditEventForm({ event }: Props) {
+    const [imagePreview, setImagePreview] = useState<string | null>("");
+    const { id, name, startDate, endDate, productId, image, discount } = event;
 
-    const { createEventMutation } = useEvents();
+    const { updateEventMutation, isUpdating } = useEvents();
+    const imagePath = image.split("\\").pop();
 
     const form = useForm<EventFormData>({
         resolver: zodResolver(eventSchema),
         defaultValues: {
-            name: "",
-            productId: "",
-            startDate: new Date(),
-            endDate: new Date(),
-            image: null,
-            discount: "",
+            name: name,
+            productId: productId,
+            startDate,
+            endDate,
+            image,
+            discount,
         },
     });
-
-    const onSubmit = (data: EventFormData) => {
-        const formData = new FormData();
-        Object.entries(data).forEach(([key, value]) => {
-            if (key === "image" && value instanceof FileList) {
-                formData.append(key, value[0]);
-            } else {
-                formData.append(key, value?.toString() ?? "");
-            }
-        });
-        const dataToSend = { ...formData, discount: 20 };
-        createEventMutation(formData);
-    };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -74,20 +64,29 @@ export default function EventForm() {
         }
     };
 
-    useEffect(() => {
-        return () => {
-            if (imagePreview) {
-                URL.revokeObjectURL(imagePreview);
+    const onSubmit = (data: EventFormData) => {
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+            if (key === "image" && value instanceof FileList) {
+                formData.append(key, value[0]);
+            } else {
+                formData.append(key, value?.toString() ?? "");
             }
-        };
-    }, [imagePreview]);
+        });
+        updateEventMutation({ id, data: formData });
+    };
 
+    useEffect(() => {
+        if (image) {
+            setImagePreview(`http://localhost:8000/uploads/${imagePath}`);
+        }
+    }, [image, imagePath]);
     return (
         <div className="p-6">
             <Form {...form}>
                 <form
-                    onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-8 "
+                    onSubmit={form.handleSubmit(onSubmit)}
                 >
                     <div className="">
                         <FormField
@@ -305,8 +304,12 @@ export default function EventForm() {
                             />
                         </div>
                     </div>
-                    <Button type="submit" className="w-full text-lg py-6">
-                        Create Event
+                    <Button
+                        type="submit"
+                        className="w-full text-lg py-6"
+                        disabled={isUpdating}
+                    >
+                        Update Event
                     </Button>
                 </form>
             </Form>
