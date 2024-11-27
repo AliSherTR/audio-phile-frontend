@@ -57,7 +57,6 @@ export default function EventForm() {
                 formData.append(key, value?.toString() ?? "");
             }
         });
-        const dataToSend = { ...formData, discount: 20 };
         createEventMutation(formData);
     };
 
