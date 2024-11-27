@@ -91,6 +91,8 @@ export const useEvents = () => {
     };
 
     const updateEvent = async ({ id, data }: UpdateEventParams) => {
+
+        console.log(data)
         const res = await fetch(`${API_URL}/${id}`, {
             method: "PATCH",
             body: data,
@@ -101,6 +103,7 @@ export const useEvents = () => {
 
         const apiResponse = await res.json();
 
+       
         if (!res.ok) {
             throw new Error(apiResponse.message);
         }
