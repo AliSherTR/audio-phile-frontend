@@ -78,9 +78,7 @@ export default function EditProduct({ product }: { product: Product }) {
     useEffect(() => {
         if (product.image) {
             setImagePreview(
-                `${process.env.NEXT_PUBLIC_IMAGE_PATH_PREFIX}/${product.image
-                    .split("\\")
-                    .pop()}`
+                product.image
             );
         }
     }, [product.image]);

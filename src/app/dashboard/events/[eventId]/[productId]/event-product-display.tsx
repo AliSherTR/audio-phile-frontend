@@ -29,17 +29,11 @@ export default function EventProductDisplay({
 }: EventProductDisplayProps) {
     const endDate = new Date(event.endDate);
 
-    const imagePath = (image: string) => {
-        return image.split("\\").pop();
-    };
-
     return (
         <div className="container mx-auto p-4 space-y-6">
             <div className="relative w-full h-64 rounded-lg overflow-hidden">
                 <Image
-                    src={`http://localhost:8000/uploads/${imagePath(
-                        event.image
-                    )}`}
+                    src={event.image}
                     alt={event.name}
                     fill
                     className=" object-contain"
@@ -60,9 +54,7 @@ export default function EventProductDisplay({
             <Card className="w-full max-w-xl mx-auto overflow-hidden">
                 <div className="relative aspect-[4/3] w-full">
                     <Image
-                        src={`http://localhost:8000/uploads/${imagePath(
-                            product.image
-                        )}`}
+                        src={product.image}
                         alt={product.name}
                         fill
                         className="object-contain"

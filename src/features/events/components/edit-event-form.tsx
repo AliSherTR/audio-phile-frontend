@@ -37,7 +37,6 @@ export default function EditEventForm({ event }: Props) {
     const { id, name, startDate, endDate, productId, image, discount } = event;
 
     const { updateEventMutation, isUpdating } = useEvents();
-    const imagePath = image.split("\\").pop();
 
     const form = useForm<EventFormData>({
         resolver: zodResolver(eventSchema),
@@ -77,10 +76,13 @@ export default function EditEventForm({ event }: Props) {
     };
 
     useEffect(() => {
-        if (image) {
-            setImagePreview(`http://localhost:8000/uploads/${imagePath}`);
+        function initializeImagePreview(){
+            if (image) {
+                setImagePreview(image);
+            }
         }
-    }, [image, imagePath]);
+        initializeImagePreview()
+    }, [image]);
     return (
         <div className="p-6">
             <Form {...form}>

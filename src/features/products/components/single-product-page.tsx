@@ -42,7 +42,7 @@ export default function SingleProductPage() {
                 <div className="space-y-4">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_PATH_PREFIX}/${imagePath}`}
+                        src={data?.image}
                         alt={data?.name || ""}
                         className="w-full h-auto object-cover rounded-lg shadow-lg p-4"
                     />

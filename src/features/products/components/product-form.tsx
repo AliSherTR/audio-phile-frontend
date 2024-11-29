@@ -71,8 +71,8 @@ export default function ProductForm() {
             }
         });
         createProductMutation(formData);
-        form.reset();
-        setImagePreview(null);
+        // form.reset();
+        // setImagePreview(null);
     }
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
