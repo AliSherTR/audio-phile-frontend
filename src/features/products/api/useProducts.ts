@@ -36,6 +36,7 @@ export default function useProducts() {
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState("");
 
+    // to do: make some changes here for performant processing of getting all the products 
     const fetchProducts = async ({
         queryKey,
     }: QueryFunctionContext<
